@@ -22,8 +22,8 @@
   {
     "id": "mile-003",
     "project_id": "proj-001",
-    "title": "Construction - Phase 1",
-    "description": "Complete 25 miles of highway expansion",
+    "title": "Construction Phase 1",
+    "description": "Complete first 25 miles of highway expansion",
     "due_date": "2025-12-01",
     "status": "in_progress",
     "completed_at": null,
@@ -42,8 +42,8 @@
   {
     "id": "mile-005",
     "project_id": "proj-002",
-    "title": "School 1-5 Modernized",
-    "description": "Complete modernization of first 5 schools",
+    "title": "Schools 1-10 Modernized",
+    "description": "Complete modernization of first 10 schools",
     "due_date": "2024-12-31",
     "status": "completed",
     "completed_at": "2024-12-15T00:00:00Z",
@@ -52,37 +52,27 @@
   {
     "id": "mile-006",
     "project_id": "proj-002",
-    "title": "School 6-15 Modernized",
-    "description": "Complete modernization of schools 6 through 15",
-    "due_date": "2025-06-30",
-    "status": "completed",
-    "completed_at": "2025-06-20T00:00:00Z",
+    "title": "Schools 11-20 Modernized",
+    "description": "Complete modernization of remaining schools",
+    "due_date": "2025-12-31",
+    "status": "in_progress",
+    "completed_at": null,
     "order_num": 2
   },
   {
     "id": "mile-007",
-    "project_id": "proj-002",
-    "title": "School 16-20 Modernized",
-    "description": "Complete modernization of final 5 schools",
-    "due_date": "2025-12-31",
-    "status": "in_progress",
-    "completed_at": null,
-    "order_num": 3
-  },
-  {
-    "id": "mile-008",
     "project_id": "proj-004",
     "title": "Tunnel Boring - Segment 1",
-    "description": "Complete first segment of tunnel boring for metro line",
+    "description": "Complete first segment of tunnel boring",
     "due_date": "2024-09-30",
-    "status": "in_progress",
+    "status": "overdue",
     "completed_at": null,
     "order_num": 1
   },
   {
-    "id": "mile-009",
+    "id": "mile-008",
     "project_id": "proj-005",
-    "title": "Health Center Site Selection",
+    "title": "Site Selection Complete",
     "description": "Identify and acquire sites for 15 health centers",
     "due_date": "2025-04-30",
     "status": "completed",
@@ -90,13 +80,73 @@
     "order_num": 1
   },
   {
-    "id": "mile-010",
+    "id": "mile-009",
     "project_id": "proj-005",
     "title": "First 5 Centers Operational",
-    "description": "Complete construction and open first 5 health centers",
+    "description": "Open first 5 health centers",
     "due_date": "2025-12-31",
     "status": "in_progress",
     "completed_at": null,
     "order_num": 2
+  },
+  {
+    "id": "mile-010",
+    "project_id": "proj-007",
+    "title": "Bridge Inspections Complete",
+    "description": "Complete safety inspections of all 25 bridges",
+    "due_date": "2024-12-31",
+    "status": "completed",
+    "completed_at": "2024-12-20T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-011",
+    "project_id": "proj-007",
+    "title": "Structural Repairs - Batch 1",
+    "description": "Complete repairs on first 10 bridges",
+    "due_date": "2025-06-30",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 2
+  },
+  {
+    "id": "mile-012",
+    "project_id": "proj-013",
+    "title": "Environmental Impact Study",
+    "description": "Complete environmental impact assessment",
+    "due_date": "2024-09-01",
+    "status": "overdue",
+    "completed_at": null,
+    "order_num": 1
+  },
+  {
+    "id": "mile-013",
+    "project_id": "proj-017",
+    "title": "Site Acquisition",
+    "description": "Acquire land for all 10 emergency centers",
+    "due_date": "2024-06-01",
+    "status": "completed",
+    "completed_at": "2024-05-15T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-014",
+    "project_id": "proj-017",
+    "title": "Construction Phase",
+    "description": "Build all 10 emergency response centers",
+    "due_date": "2025-12-31",
+    "status": "blocked",
+    "completed_at": null,
+    "order_num": 2
+  },
+  {
+    "id": "mile-015",
+    "project_id": "proj-018",
+    "title": "Bus Fleet Procurement",
+    "description": "Order 100 electric buses from suppliers",
+    "due_date": "2025-06-01",
+    "status": "completed",
+    "completed_at": "2025-05-28T00:00:00Z",
+    "order_num": 1
   }
 ]

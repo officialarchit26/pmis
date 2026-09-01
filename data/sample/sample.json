@@ -1,38 +1,13 @@
 {
-  "note": "This is sample data for testing the frontend and backend before connecting to the actual database.",
-  "purpose": "Allows development and testing without requiring Supabase connection",
-  "dashboard": {
-    "total_projects": 10,
-    "active_projects": 7,
-    "completed_projects": 1,
-    "on_hold_projects": 1,
-    "planning_projects": 1,
-    "total_budget": 70300000,
-    "utilized_budget": 52250000,
-    "average_progress": 58.5,
-    "at_risk_projects": 2
-  },
-  "status_distribution": {
-    "planning": 1,
-    "active": 7,
-    "on_hold": 1,
-    "completed": 1,
-    "cancelled": 0
-  },
-  "priority_distribution": {
-    "low": 0,
-    "medium": 4,
-    "high": 3,
-    "critical": 3
-  },
-  "budget_by_department": [
-    { "department": "Transportation", "allocated": 24500000, "utilized": 11750000 },
-    { "department": "Environment", "allocated": 12000000, "utilized": 3600000 },
-    { "department": "Health", "allocated": 6000000, "utilized": 3300000 },
-    { "department": "Public Works", "allocated": 8000000, "utilized": 400000 },
-    { "department": "Education", "allocated": 2500000, "utilized": 2125000 },
-    { "department": "Housing", "allocated": 20000000, "utilized": 19800000 },
-    { "department": "Technology", "allocated": 5300000, "utilized": 4140000 },
-    { "department": "Finance", "allocated": 0, "utilized": 0 }
-  ]
+  "_notice": "DEMO / SYNTHETIC DATA - not real government data",
+  "total_projects": 18,
+  "active_projects": 12,
+  "completed_projects": 1,
+  "on_hold_projects": 2,
+  "delayed_projects": 1,
+  "planning_projects": 2,
+  "at_risk_projects": 4,
+  "total_budget": 161300000,
+  "utilized_budget": 65040000,
+  "average_progress": 47.3
 }

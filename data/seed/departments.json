@@ -3,48 +3,30 @@
     "id": "dept-001",
     "name": "Department of Transportation",
     "code": "DOT",
-    "description": "Responsible for highways, roads, bridges, and transportation infrastructure across all districts."
+    "description": "Responsible for highways, roads, bridges, and transportation infrastructure"
   },
   {
     "id": "dept-002",
     "name": "Department of Education",
     "code": "EDU",
-    "description": "Handles school construction, renovation, and educational facilities modernization."
+    "description": "Handles school construction, renovation, and educational facilities"
   },
   {
     "id": "dept-003",
     "name": "Department of Health",
     "code": "HLT",
-    "description": "Manages hospitals, clinics, healthcare facilities, and public health infrastructure."
+    "description": "Manages hospitals, clinics, and healthcare infrastructure projects"
   },
   {
     "id": "dept-004",
     "name": "Department of Public Works",
     "code": "PWK",
-    "description": "Water treatment, sewage systems, public utilities, and municipal infrastructure."
+    "description": "Water treatment, sewage, and public utility infrastructure"
   },
   {
     "id": "dept-005",
-    "name": "Department of Finance",
-    "code": "FIN",
-    "description": "Government financial systems, fiscal infrastructure, and budget management systems."
-  },
-  {
-    "id": "dept-006",
-    "name": "Department of Housing",
-    "code": "HSG",
-    "description": "Public housing, urban development, affordable housing, and community development."
-  },
-  {
-    "id": "dept-007",
     "name": "Department of Environment",
     "code": "ENV",
-    "description": "Environmental protection, renewable energy, conservation, and climate initiatives."
-  },
-  {
-    "id": "dept-008",
-    "name": "Department of Technology",
-    "code": "TECH",
-    "description": "Digital infrastructure, smart city initiatives, IT systems, and e-government services."
+    "description": "Environmental protection, renewable energy, and conservation projects"
   }
 ]

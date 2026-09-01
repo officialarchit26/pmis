@@ -1,143 +1,84 @@
 # Project Pulse
 
-> **Government Project Monitoring Platform**
+> Government Project Monitoring Platform
 
-## Project Purpose
+## ⚠️ DEMO DATA
 
-A web-based integrated platform to help government administrators and officers monitor government projects across departments and districts. The platform will track project progress, budgets, milestones, and locations with AI-powered risk analysis and reports.
-
----
+All data in `data/` folder is **SYNTHETIC / DEMO** data. Not real government data.
 
 ## Technology Stack
 
 | Component  | Technology                  |
 |------------|------------------------------|
-| Frontend   | React 18 + Vite              |
+| Frontend   | React 18 + Vite + Tailwind  |
 | Backend    | Node.js + Express.js         |
 | Database   | PostgreSQL (Supabase)        |
-| AI Engine  | Google Gemini API            |
-| Data       | JSON seed files              |
+| AI Engine  | Google Gemini API (future)    |
+| Data       | JSON seed files             |
 
----
+## Current Phase
 
-## Current Development Phase
-
-**Phase 1: Project Setup** — _In Progress_
-
-Only the basic project structure has been created. No application features are implemented yet.
-
-### Phase Roadmap
-
-- [x] **Phase 1** — Project Setup ← _You are here_
-- [ ] **Phase 2** — Database & Seed Data
-- [ ] **Phase 3** — Backend API
-- [ ] **Phase 4** — Frontend Dashboard
-- [ ] **Phase 5** — Map Integration
-- [ ] **Phase 6** — AI Integration
-- [ ] **Phase 7** — Testing & Deployment
-
----
+**Phase 1 & 2: Setup** — In Progress
 
 ## Project Structure
 
 ```
 project-pulse/
-├── frontend/          # React application
-├── backend/           # Node.js + Express API
-├── ai/                # AI engine (future Gemini integration)
-├── database/          # Database schema and migrations
-├── data/              # Seed and sample data
-│   ├── seed/
-│   └── sample/
-├── docs/              # Documentation
-├── .gitignore
-└── README.md
+├── frontend/          # React app
+├── backend/         # Express API
+├── database/        # PostgreSQL schema
+├── data/            # Seed data
+│   ├── seed/       # Database seed files
+│   └── sample/     # Sample data
+└── docs/           # Documentation
 ```
 
----
+## Quick Start
 
-## How to Start the Frontend
-
-```bash
-# 1. Navigate to frontend directory
-cd frontend
-
-# 2. Install dependencies
-npm install
-
-# 3. Start the development server
-npm run dev
-
-# 4. Open your browser
-#    Frontend: http://localhost:5173
-```
-
-**Note**: Frontend will show a placeholder page until the backend is connected.
-
----
-
-## How to Start the Backend
+### 1. Backend
 
 ```bash
-# 1. Navigate to backend directory
 cd backend
-
-# 2. Install dependencies
 npm install
-
-# 3. Create .env file (optional for Phase 1)
-cp .env.example .env
-
-# 4. Start the development server
 npm start
-
-# 5. Test the health endpoint
-#    Visit: http://localhost:3001/api/health
+# Test: http://localhost:3001/api/health
 ```
 
-**Expected response from `/api/health`:**
-```json
-{
-  "status": "ok",
-  "service": "project-pulse-backend"
-}
-```
-
----
-
-## Testing the Setup
-
-### 1. Test the Backend
-
-After starting the backend, run this in your terminal:
+### 2. Frontend
 
 ```bash
-curl http://localhost:3001/api/health
+cd frontend
+npm install
+npm run dev
+# Open: http://localhost:5173
 ```
 
-You should see:
-```json
-{"status":"ok","service":"project-pulse-backend"}
-```
+## Supabase Setup
 
-### 2. Test the Frontend
+See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for detailed instructions.
 
-After starting the frontend, open `http://localhost:5173` in your browser. You should see:
+### Required Values
 
-> **Project Pulse**
-> Government Project Monitoring Platform
-> Frontend is ready. Connect the backend to continue.
+| Variable | Where to Get It |
+|----------|-----------------|
+| `SUPABASE_URL` | Supabase Dashboard → Settings → API |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Settings → API |
 
----
+## Database
 
-## Prerequisites
+Schema: `database/schema.sql`
 
-- **Node.js** v18+ ([Download](https://nodejs.org))
-- **npm** (comes with Node.js)
-- A modern web browser
+Tables:
+- departments, districts, users
+- projects, milestones, budgets
+- risk_assessments, reports, chat_sessions, chat_messages
 
----
+## Development Phases
 
-## License
-
-This project is for educational and prototype purposes.
+- [x] Phase 1: Project Setup
+- [x] Phase 2: Database & Seed Data
+- [ ] Phase 3: Backend API
+- [ ] Phase 4: Frontend Dashboard
+- [ ] Phase 5: Map Integration
+- [ ] Phase 6: AI Integration
+- [ ] Phase 7: Testing & Deployment

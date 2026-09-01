@@ -41,14 +41,6 @@
   },
   {
     "id": "bud-006",
-    "project_id": "proj-002",
-    "category": "Training",
-    "allocated": 500000,
-    "utilized": 375000,
-    "fiscal_year": "2025"
-  },
-  {
-    "id": "bud-007",
     "project_id": "proj-004",
     "category": "Materials",
     "allocated": 5000000,
@@ -56,7 +48,7 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-008",
+    "id": "bud-007",
     "project_id": "proj-004",
     "category": "Labor",
     "allocated": 6000000,
@@ -64,15 +56,7 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-009",
-    "project_id": "proj-004",
-    "category": "Engineering",
-    "allocated": 4000000,
-    "utilized": 1400000,
-    "fiscal_year": "2025"
-  },
-  {
-    "id": "bud-010",
+    "id": "bud-008",
     "project_id": "proj-005",
     "category": "Construction",
     "allocated": 3500000,
@@ -80,7 +64,7 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-011",
+    "id": "bud-009",
     "project_id": "proj-005",
     "category": "Medical Equipment",
     "allocated": 1500000,
@@ -88,11 +72,35 @@
     "fiscal_year": "2025"
   },
   {
+    "id": "bud-010",
+    "project_id": "proj-006",
+    "category": "Solar Panels",
+    "allocated": 8000000,
+    "utilized": 2400000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-011",
+    "project_id": "proj-007",
+    "category": "Repairs",
+    "allocated": 3000000,
+    "utilized": 1440000,
+    "fiscal_year": "2025"
+  },
+  {
     "id": "bud-012",
-    "project_id": "proj-005",
-    "category": "Staffing",
-    "allocated": 1000000,
-    "utilized": 600000,
+    "project_id": "proj-013",
+    "category": "Construction",
+    "allocated": 6000000,
+    "utilized": 1680000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-013",
+    "project_id": "proj-013",
+    "category": "Engineering",
+    "allocated": 3000000,
+    "utilized": 840000,
     "fiscal_year": "2025"
   }
 ]
