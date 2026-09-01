@@ -1,0 +1,66 @@
+[
+  {
+    "id": "1",
+    "name": "Northern District",
+    "state": "California",
+    "region": "West Coast",
+    "latitude": 38.5816,
+    "longitude": -121.4944
+  },
+  {
+    "id": "2",
+    "name": "Central District",
+    "state": "Texas",
+    "region": "South Central",
+    "latitude": 30.2672,
+    "longitude": -97.7431
+  },
+  {
+    "id": "3",
+    "name": "Eastern District",
+    "state": "New York",
+    "region": "Northeast",
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  },
+  {
+    "id": "4",
+    "name": "Southern District",
+    "state": "Florida",
+    "region": "Southeast",
+    "latitude": 25.7617,
+    "longitude": -80.1918
+  },
+  {
+    "id": "5",
+    "name": "Western District",
+    "state": "Washington",
+    "region": "Pacific Northwest",
+    "latitude": 47.6062,
+    "longitude": -122.3321
+  },
+  {
+    "id": "6",
+    "name": "Mountain District",
+    "state": "Colorado",
+    "region": "Rocky Mountain",
+    "latitude": 39.7392,
+    "longitude": -104.9903
+  },
+  {
+    "id": "7",
+    "name": "Great Lakes District",
+    "state": "Illinois",
+    "region": "Midwest",
+    "latitude": 41.8781,
+    "longitude": -87.6298
+  },
+  {
+    "id": "8",
+    "name": "Mid-Atlantic District",
+    "state": "Virginia",
+    "region": "East Coast",
+    "latitude": 37.5407,
+    "longitude": -77.4360
+  }
+]

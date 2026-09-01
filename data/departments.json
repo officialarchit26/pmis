@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "name": "Department of Transportation",
+    "code": "DOT",
+    "description": "Responsible for highways, roads, bridges, and transportation infrastructure"
+  },
+  {
+    "id": "2",
+    "name": "Department of Education",
+    "code": "EDU",
+    "description": "Handles school construction, renovation, and educational facilities"
+  },
+  {
+    "id": "3",
+    "name": "Department of Health",
+    "code": "HLT",
+    "description": "Manages hospitals, clinics, and healthcare infrastructure projects"
+  },
+  {
+    "id": "4",
+    "name": "Department of Public Works",
+    "code": "PWK",
+    "description": "Water treatment, sewage, and public utility infrastructure"
+  },
+  {
+    "id": "5",
+    "name": "Department of Finance",
+    "code": "FIN",
+    "description": "Government financial systems and fiscal infrastructure"
+  },
+  {
+    "id": "6",
+    "name": "Department of Housing",
+    "code": "HSG",
+    "description": "Public housing, urban development, and housing assistance programs"
+  },
+  {
+    "id": "7",
+    "name": "Department of Environment",
+    "code": "ENV",
+    "description": "Environmental protection, renewable energy, and conservation projects"
+  },
+  {
+    "id": "8",
+    "name": "Department of Technology",
+    "code": "TECH",
+    "description": "Digital infrastructure, smart city initiatives, and IT systems"
+  }
+]
