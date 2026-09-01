@@ -1,0 +1,42 @@
+[
+  {
+    "id": "dist-001",
+    "name": "Northern District",
+    "state": "California",
+    "region": "West Coast",
+    "latitude": 38.5816,
+    "longitude": -121.4944
+  },
+  {
+    "id": "dist-002",
+    "name": "Central District",
+    "state": "Texas",
+    "region": "South Central",
+    "latitude": 30.2672,
+    "longitude": -97.7431
+  },
+  {
+    "id": "dist-003",
+    "name": "Eastern District",
+    "state": "New York",
+    "region": "Northeast",
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  },
+  {
+    "id": "dist-004",
+    "name": "Southern District",
+    "state": "Florida",
+    "region": "Southeast",
+    "latitude": 25.7617,
+    "longitude": -80.1918
+  },
+  {
+    "id": "dist-005",
+    "name": "Western District",
+    "state": "Washington",
+    "region": "Pacific Northwest",
+    "latitude": 47.6062,
+    "longitude": -122.3321
+  }
+]

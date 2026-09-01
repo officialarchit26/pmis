@@ -1,0 +1,102 @@
+[
+  {
+    "id": "mile-001",
+    "project_id": "proj-001",
+    "title": "Planning Phase Complete",
+    "description": "Complete all planning, environmental review, and permits",
+    "due_date": "2025-03-01",
+    "status": "completed",
+    "completed_at": "2025-02-28T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-002",
+    "project_id": "proj-001",
+    "title": "Design Approval",
+    "description": "Final design approval from state authorities",
+    "due_date": "2025-06-01",
+    "status": "completed",
+    "completed_at": "2025-05-30T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-003",
+    "project_id": "proj-001",
+    "title": "Construction - Phase 1",
+    "description": "Complete 25 miles of highway expansion",
+    "due_date": "2025-12-01",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-004",
+    "project_id": "proj-001",
+    "title": "Final Inspection",
+    "description": "Complete final safety and quality inspection",
+    "due_date": "2026-03-01",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-005",
+    "project_id": "proj-002",
+    "title": "School 1-5 Modernized",
+    "description": "Complete modernization of first 5 schools",
+    "due_date": "2024-12-31",
+    "status": "completed",
+    "completed_at": "2024-12-15T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-006",
+    "project_id": "proj-002",
+    "title": "School 6-15 Modernized",
+    "description": "Complete modernization of schools 6 through 15",
+    "due_date": "2025-06-30",
+    "status": "completed",
+    "completed_at": "2025-06-20T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-007",
+    "project_id": "proj-002",
+    "title": "School 16-20 Modernized",
+    "description": "Complete modernization of final 5 schools",
+    "due_date": "2025-12-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-008",
+    "project_id": "proj-004",
+    "title": "Tunnel Boring - Segment 1",
+    "description": "Complete first segment of tunnel boring for metro line",
+    "due_date": "2024-09-30",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 1
+  },
+  {
+    "id": "mile-009",
+    "project_id": "proj-005",
+    "title": "Health Center Site Selection",
+    "description": "Identify and acquire sites for 15 health centers",
+    "due_date": "2025-04-30",
+    "status": "completed",
+    "completed_at": "2025-04-15T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-010",
+    "project_id": "proj-005",
+    "title": "First 5 Centers Operational",
+    "description": "Complete construction and open first 5 health centers",
+    "due_date": "2025-12-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 2
+  }
+]
