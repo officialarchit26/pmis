@@ -1,11 +1,10 @@
 // Project Pulse - Backend Server
-// Node.js + Express API
+// Complete MVP Implementation
 
 require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const healthRoutes = require('./routes/health.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,16 +13,41 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Import routes
+const healthRoutes = require('./routes/health.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
+const projectsRoutes = require('./routes/projects.routes');
+const departmentsRoutes = require('./routes/departments.routes');
+const districtsRoutes = require('./routes/districts.routes');
+const alertsRoutes = require('./routes/alerts.routes');
+const aiRoutes = require('./routes/ai.routes');
+
+// API Routes
 app.use('/api', healthRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/projects', projectsRoutes);
+app.use('/api/departments', departmentsRoutes);
+app.use('/api/districts', districtsRoutes);
+app.use('/api/alerts', alertsRoutes);
+app.use('/api/ai', aiRoutes);
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Project Pulse API',
+    version: '1.0.0',
+    status: 'running'
+  });
+});
 
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
+    success: false,
     error: {
       code: 'NOT_FOUND',
-      message: 'Route not found',
-    },
+      message: `Route ${req.method} ${req.path} not found`
+    }
   });
 });
 
@@ -31,16 +55,27 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('Server Error:', err);
   res.status(500).json({
+    success: false,
     error: {
       code: 'INTERNAL_ERROR',
-      message: 'Internal server error',
-    },
+      message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    }
   });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log('✓ Project Pulse Backend running on port', PORT);
-  console.log('  Health check: http://localhost:' + PORT + '/api/health');
-  console.log('  Full health: http://localhost:' + PORT + '/api/health/full');
+  console.log('===========================================');
+  console.log('  Project Pulse Backend');
+  console.log('  Running on port', PORT);
+  console.log('===========================================');
+  console.log('  Health:      http://localhost:' + PORT + '/api/health');
+  console.log('  Dashboard:   http://localhost:' + PORT + '/api/dashboard/summary');
+  console.log('  Projects:    http://localhost:' + PORT + '/api/projects');
+  console.log('  Departments: http://localhost:' + PORT + '/api/departments');
+  console.log('  Districts:   http://localhost:' + PORT + '/api/districts');
+  console.log('  AI:         http://localhost:' + PORT + '/api/ai/assistant');
+  console.log('===========================================');
 });
+
+module.exports = app;

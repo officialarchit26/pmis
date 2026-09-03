@@ -1,31 +1,46 @@
 // Health check routes
 const express = require('express');
-const { testConnection } = require('../config/supabase');
-
 const router = express.Router();
+const { getSupabase } = require('../config/database');
 
 // Basic health check
 router.get('/health', (req, res) => {
   res.json({
-    status: 'ok',
-    service: 'project-pulse-backend',
-    timestamp: new Date().toISOString(),
+    success: true,
+    data: {
+      status: 'ok',
+      service: 'project-pulse-backend',
+      timestamp: new Date().toISOString()
+    }
   });
 });
 
-// Detailed health check (includes database connection)
+// Full health check with database
 router.get('/health/full', async (req, res) => {
-  const dbStatus = await testConnection();
+  let dbStatus = 'not_configured';
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { error } = await supabase.from('departments').select('id').limit(1);
+      dbStatus = error ? 'error' : 'connected';
+    }
+  } catch (err) {
+    dbStatus = 'error';
+  }
 
   res.json({
-    status: 'ok',
-    service: 'project-pulse-backend',
-    timestamp: new Date().toISOString(),
-    database: {
-      provider: 'Supabase',
-      connected: dbStatus.connected,
-      reason: dbStatus.reason || null,
-    },
+    success: true,
+    data: {
+      status: 'ok',
+      service: 'project-pulse-backend',
+      timestamp: new Date().toISOString(),
+      database: {
+        provider: 'Supabase',
+        status: dbStatus
+      },
+      environment: process.env.NODE_ENV || 'development'
+    }
   });
 });
 

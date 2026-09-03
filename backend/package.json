@@ -1,6 +1,6 @@
 {
   "name": "project-pulse-backend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Project Pulse Backend - Express API server",
   "main": "src/server.js",
   "scripts": {

@@ -29,10 +29,10 @@ function App() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-5xl font-bold text-gray-900 mb-3">
-              Project Pulse
+              PMIS
             </h1>
-            <p className="text-xl text-gray-600">
-              Government Project Monitoring Platform
+            <p className="text-xl text-green-600">
+              Project Monitoring & Intelligence System 
             </p>
           </div>
 
