@@ -32,7 +32,7 @@ const ROLE_NAV = {
   ],
 };
 
-export default function RoleSidebar() {
+export default function RoleSidebar({ onOpenAi }) {
   const { user, logout, ROLE_LABELS } = useAuth();
   const navigate = useNavigate();
 
@@ -68,6 +68,22 @@ export default function RoleSidebar() {
               </NavLink>
             </li>
           ))}
+
+          {/* AI Assistant Nav Item */}
+          {onOpenAi && (
+            <li className="pt-2 border-t border-slate-700/60 mt-2">
+              <button
+                onClick={onOpenAi}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-900/60 to-blue-900/60 border border-blue-500/30 text-blue-200 hover:bg-blue-600 hover:text-white transition-all text-left"
+              >
+                <span className="text-xl">🤖</span>
+                <div className="flex-1">
+                  <span className="font-semibold text-sm">AI Assistant</span>
+                  <span className="block text-[10px] text-blue-300 font-normal">Gemini Intelligence</span>
+                </div>
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
       {user && (

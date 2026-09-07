@@ -118,22 +118,32 @@ router.get('/summary', async (req, res) => {
         success: true,
         data: {
           kpis: computeKpis(projects || []),
-          projects_by_department: (departments || []).map(dept => ({
-            department_id: dept.id,
-            department_name: dept.name,
-            project_count: (projects || []).filter(p => p.department_id === dept.id).length,
-            total_budget: (projects || []).reduce((s, p) => s + (p.budget_total || 0), 0),
-            utilized_budget: (projects || []).reduce((s, p) => s + (p.budget_utilized || 0), 0),
-            avg_progress: 0
-          })),
-          projects_by_district: (districts || []).map(dist => ({
-            district_id: dist.id,
-            district_name: dist.name,
-            state: dist.state,
-            project_count: (projects || []).filter(p => p.district_id === dist.id).length,
-            total_budget: (projects || []).reduce((s, p) => s + (p.budget_total || 0), 0),
-            avg_progress: 0
-          })),
+          projects_by_department: (departments || []).map(dept => {
+            const deptProjects = (projects || []).filter(p => p.department_id === dept.id);
+            return {
+              department_id: dept.id,
+              department_name: dept.name,
+              project_count: deptProjects.length,
+              total_budget: deptProjects.reduce((s, p) => s + (p.budget_total || 0), 0),
+              utilized_budget: deptProjects.reduce((s, p) => s + (p.budget_utilized || 0), 0),
+              avg_progress: deptProjects.length > 0
+                ? Math.round((deptProjects.reduce((s, p) => s + (p.progress_percent || 0), 0) / deptProjects.length) * 10) / 10
+                : 0
+            };
+          }),
+          projects_by_district: (districts || []).map(dist => {
+            const distProjects = (projects || []).filter(p => p.district_id === dist.id);
+            return {
+              district_id: dist.id,
+              district_name: dist.name,
+              state: dist.state,
+              project_count: distProjects.length,
+              total_budget: distProjects.reduce((s, p) => s + (p.budget_total || 0), 0),
+              avg_progress: distProjects.length > 0
+                ? Math.round((distProjects.reduce((s, p) => s + (p.progress_percent || 0), 0) / distProjects.length) * 10) / 10
+                : 0
+            };
+          }),
           projects_by_status: ['planning', 'active', 'on_hold', 'completed', 'delayed', 'cancelled'].map(
             status => ({
               status,

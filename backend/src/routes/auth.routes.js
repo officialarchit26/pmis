@@ -18,32 +18,21 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const supabase = getSupabase();
+    // Demo login - accepts any password for demo accounts in demo mode
+    const demoUsers = {
+      'worker@pmis.demo': { role: 'worker', department_id: 'dept-001', district_id: 'dist-001', full_name: 'John Worker' },
+      'official@pmis.demo': { role: 'official', department_id: 'dept-001', district_id: 'dist-001', full_name: 'Jane Official' },
+      'senior@pmis.demo': { role: 'senior_official', department_id: null, district_id: null, full_name: 'Robert Senior' },
+      'admin@pmis.demo': { role: 'admin', department_id: null, district_id: null, full_name: 'Sarah Admin' },
+    };
 
-    // Development mode without Supabase
-    if (!supabase) {
-      // Demo login - accepts any password for demo accounts
-      const demoUsers = {
-        'worker@pmis.demo': { role: 'worker', department_id: 'dept-001', district_id: 'dist-001' },
-        'official@pmis.demo': { role: 'official', department_id: 'dept-001', district_id: 'dist-001' },
-        'senior@pmis.demo': { role: 'senior_official', department_id: null, district_id: null },
-        'admin@pmis.demo': { role: 'admin', department_id: null, district_id: null },
-      };
-
-      const demoUser = demoUsers[email.toLowerCase()];
-      if (!demoUser) {
-        return res.status(401).json({
-          success: false,
-          error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' }
-        });
-      }
-
+    const demoUser = demoUsers[email.toLowerCase()];
+    if (demoUser) {
       // Return demo session with role-encoded token
       return res.json({
         success: true,
         data: {
           session: {
-            // Token encodes role: demo-{role}-{timestamp}
             access_token: `demo-${demoUser.role}-${Date.now()}`,
             user: {
               id: 'demo-' + demoUser.role,
@@ -51,11 +40,20 @@ router.post('/login', async (req, res) => {
               role: demoUser.role,
               department_id: demoUser.department_id,
               district_id: demoUser.district_id,
-              full_name: email.split('@')[0],
+              full_name: demoUser.full_name,
               is_demo: true
             }
           }
         }
+      });
+    }
+
+    const supabase = getSupabase();
+
+    if (!supabase) {
+      return res.status(401).json({
+        success: false,
+        error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' }
       });
     }
 

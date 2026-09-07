@@ -144,7 +144,31 @@ export async function getAlerts(filters = {}) {
   return request(`/alerts${query}`);
 }
 
-// ============ AUTH (for future) ============
+// ============ AI LAYER ============
+export async function getRiskAnalysis(projectId) {
+  return request(`/ai/risk-analysis/${projectId}`);
+}
+
+export async function askAiAssistant(message, projectId = null) {
+  return request('/ai/assistant', {
+    method: 'POST',
+    body: { message, project_id: projectId },
+  });
+}
+
+export async function generateAiReport(projectId, reportType = 'full') {
+  return request(`/ai/report/${projectId}`, {
+    method: 'POST',
+    body: { report_type: reportType },
+  });
+}
+
+export async function getAiReports(projectId = null) {
+  const endpoint = projectId ? `/ai/reports/${projectId}` : '/ai/reports';
+  return request(endpoint);
+}
+
+// ============ AUTH ============
 export async function login(credentials) {
   return request('/auth/login', {
     method: 'POST',
@@ -177,6 +201,10 @@ export default {
   getDepartmentById,
   getDistricts,
   getAlerts,
+  getRiskAnalysis,
+  askAiAssistant,
+  generateAiReport,
+  getAiReports,
   login,
   logout,
   getCurrentUser,

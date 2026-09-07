@@ -7,7 +7,7 @@ const { getSupabase, isUsingMemoryStore, memoryStore } = require('../config/data
 const { calculateRiskScore } = require('../services/riskService');
 
 // Gemini service
-const { askGemini } = require('../services/geminiService');
+const { askGemini, generateAIReport } = require('../services/geminiService');
 
 // GET /api/ai/risk-analysis/:projectId
 router.get('/risk-analysis/:projectId', async (req, res) => {
@@ -35,14 +35,24 @@ router.get('/risk-analysis/:projectId', async (req, res) => {
       };
     } else {
       const supabase = getSupabase();
+      const { data: projectData, error: projErr } = await supabase
+        .from('projects')
+        .select('*, department:departments(name), district:districts(name)')
+        .eq('id', projectId)
+        .single();
+      if (projErr || !projectData) {
+        return res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Project not found' }
+        });
+      }
       const { data: milestonesData } = await supabase.from('milestones').select('*').eq('project_id', projectId);
       const { data: budgetsData } = await supabase.from('budgets').select('*').eq('project_id', projectId);
-      const { data, error } = await supabase.from('projects').select(`*,
-        milestones: Milestones(*),
-        budgets: Budgets(*)
-      `).eq('id', projectId).single();
-      if (error) throw error;
-      project = data || {};
+      project = {
+        ...projectData,
+        milestones: milestonesData || [],
+        budgets: budgetsData || []
+      };
     }
 
     // Calculate risk analysis
@@ -83,12 +93,16 @@ router.post('/assistant', async (req, res) => {
         }
       } else {
         const supabase = getSupabase();
-        const { data: project, error } = await supabase
+        const { data: project } = await supabase
           .from('projects')
-          .select('*, milestones:Milestones(*), budgets:Budgets(*)')
+          .select('*, department:departments(name), district:districts(name)')
           .eq('id', project_id)
           .single();
         if (project) {
+          const { data: milestones } = await supabase.from('milestones').select('*').eq('project_id', project_id);
+          const { data: budgets } = await supabase.from('budgets').select('*').eq('project_id', project_id);
+          project.milestones = milestones || [];
+          project.budgets = budgets || [];
           context = buildProjectContextForDatabase(project);
         }
       }
@@ -96,24 +110,35 @@ router.post('/assistant', async (req, res) => {
 
     // General context if no project specified
     if (!context) {
-      const projects = isUsingMemoryStore() ? memoryStore.projects : [];
+      let projects = [];
+      if (isUsingMemoryStore()) {
+        projects = memoryStore.projects;
+      } else {
+        const supabase = getSupabase();
+        const { data } = await supabase
+          .from('projects')
+          .select('*, department:departments(name), district:districts(name)');
+        projects = data || [];
+      }
+
       if (projects.length === 0) {
         context = 'No projects available in the system.';
       } else {
         const total = projects.length;
         const active = projects.filter(p => p.status === 'active').length;
-        const delayed = projects.filter(p => p.status === 'delayed').length;
-        const atRisk = projects.filter(p => p.risk_score >= 60).length;
+        const delayed = projects.filter(p => p.status === 'delayed');
+        const atRisk = projects.filter(p => (p.risk_score || 0) >= 60);
         const totalBudget = projects.reduce((sum, p) => sum + (p.budget_total || 0), 0);
         const utilizedBudget = projects.reduce((sum, p) => sum + (p.budget_utilized || 0), 0);
 
-        context = `Overall Statistics:\n`;
+        context = `PMIS System Ground-Truth Data:\n`;
         context += `- Total Projects: ${total}\n`;
         context += `- Active Projects: ${active}\n`;
-        context += `- Delayed Projects: ${delayed}\n`;
-        context += `- At-Risk Projects: ${atRisk}\n`;
-        context += `- Total Budget: $${totalBudget.toLocaleString()}\n`;
-        context += `- Utilized Budget: $${utilizedBudget.toLocaleString()}\n`;
+        context += `- Delayed Projects (${delayed.length}): ${delayed.map(p => `${p.name} (${p.progress_percent}% progress, budget $${(p.budget_total || 0).toLocaleString()})`).join('; ') || 'None'}\n`;
+        context += `- High Risk Projects (${atRisk.length}): ${atRisk.map(p => `${p.name} (Risk ${p.risk_score}/100, status: ${p.status})`).join('; ') || 'None'}\n`;
+        context += `- Total System Budget: $${totalBudget.toLocaleString()}\n`;
+        context += `- Utilized Budget: $${utilizedBudget.toLocaleString()} (${totalBudget > 0 ? Math.round((utilizedBudget / totalBudget) * 100) : 0}%)\n`;
+        context += `- All Projects Summary:\n` + projects.slice(0, 10).map(p => `  * ${p.name}: status=${p.status}, progress=${p.progress_percent}%, risk=${p.risk_score}/100, dept=${p.department?.name || 'General'}`).join('\n');
       }
     }
 
@@ -312,7 +337,7 @@ function generateReport(project, riskAnalysis, reportType) {
             ? milestones.map(m => {
                 const status = m.status || 'pending';
                 const completedAt = m.completed_at ? new Date(m.completed_at).toLocaleDateString() : 'N/A';
-                return `- ${m.title}: ${status} ${status === 'completed' ? `(completed: ${completedAt})` : `(due: ${m.due_date || 'No due date'})`;
+                return `- ${m.title}: ${status} ${status === 'completed' ? `(completed: ${completedAt})` : `(due: ${m.due_date || 'No due date'})`}`;
               }).join('\n')
             : 'No milestones recorded'
         },
@@ -351,5 +376,112 @@ function calculateExpectedProgress(project) {
 
   return Math.round((elapsed / totalDuration) * 100);
 }
+
+// POST /api/ai/report/:projectId - Generate full AI intelligence report
+router.post('/report/:projectId', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { report_type = 'full' } = req.body;
+    let project;
+
+    if (isUsingMemoryStore()) {
+      project = memoryStore.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Project not found' } });
+      }
+      project.milestones = memoryStore.getMilestonesByProject(projectId);
+      project.budgets = memoryStore.getBudgetsByProject(projectId);
+      project.department = memoryStore.getDepartmentById(project.department_id);
+      project.district = memoryStore.getDistrictById(project.district_id);
+    } else {
+      const supabase = getSupabase();
+      const { data: projectData, error: projErr } = await supabase
+        .from('projects')
+        .select('*, department:departments(name), district:districts(name)')
+        .eq('id', projectId)
+        .single();
+      if (projErr || !projectData) {
+        return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Project not found' } });
+      }
+      const { data: milestonesData } = await supabase.from('milestones').select('*').eq('project_id', projectId);
+      const { data: budgetsData } = await supabase.from('budgets').select('*').eq('project_id', projectId);
+      project = {
+        ...projectData,
+        milestones: milestonesData || [],
+        budgets: budgetsData || []
+      };
+    }
+
+    const riskAnalysis = calculateRiskScore(project);
+    const reportData = await generateAIReport(project, riskAnalysis, report_type);
+
+    // Save report in Supabase if available
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        await supabase.from('reports').insert([{
+          project_id: projectId,
+          ai_generated_title: reportData.title,
+          ai_generated_content: reportData,
+          report_type: report_type
+        }]);
+      } catch (saveErr) {
+        console.warn('Could not persist report to database:', saveErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      data: reportData
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message }
+    });
+  }
+});
+
+// GET /api/ai/reports - List recent reports
+router.get('/reports', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .order('generated_at', { ascending: false })
+        .limit(20);
+      if (!error && data) {
+        return res.json({ success: true, data });
+      }
+    }
+    res.json({ success: true, data: [] });
+  } catch (error) {
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+// GET /api/ai/reports/:projectId - Get latest reports for project
+router.get('/reports/:projectId', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('generated_at', { ascending: false })
+        .limit(5);
+      if (!error && data) {
+        return res.json({ success: true, data });
+      }
+    }
+    res.json({ success: true, data: [] });
+  } catch (error) {
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
 
 module.exports = router;

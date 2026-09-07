@@ -41,7 +41,7 @@ router.get('/', authenticateUser, async (req, res) => {
       }));
     } else {
       const supabase = getSupabase();
-      let query = supabase.from('projects').select('*');
+      let query = supabase.from('projects').select('*, department:departments(id, name, code), district:districts(id, name, state)');
 
       // Apply role-based filtering
       query = applyScopeFilter(query, req.user);
@@ -90,7 +90,7 @@ router.get('/my-projects', authenticateUser, requireRole('worker', 'official', '
       }));
     } else {
       const supabase = getSupabase();
-      let query = supabase.from('projects').select('*');
+      let query = supabase.from('projects').select('*, department:departments(id, name, code), district:districts(id, name, state)');
       query = applyScopeFilter(query, user);
       const { data, error } = await query;
       if (error) throw error;
@@ -125,7 +125,7 @@ router.get('/department', authenticateUser, requireRole('official', 'senior_offi
       const filterDept = department_id || req.user.department_id;
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
+        .select('*, department:departments(id, name, code), district:districts(id, name, state)')
         .eq('department_id', filterDept);
       if (error) throw error;
       projects = data || [];
@@ -153,7 +153,7 @@ router.get('/all', authenticateUser, requireRole('senior_official', 'admin'), as
       }));
     } else {
       const supabase = getSupabase();
-      const { data, error } = await supabase.from('projects').select('*');
+      const { data, error } = await supabase.from('projects').select('*, department:departments(id, name, code), district:districts(id, name, state)');
       if (error) throw error;
       projects = data || [];
     }
@@ -190,7 +190,7 @@ router.get('/map-data', authenticateUser, async (req, res) => {
       const supabase = getSupabase();
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
+        .select('*, department:departments(id, name, code), district:districts(id, name, state)')
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
       if (error) throw error;
@@ -239,7 +239,29 @@ router.get('/:id', authenticateUser, async (req, res) => {
       const supabase = getSupabase();
       const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
       if (error) throw error;
-      project = data;
+      if (!data) {
+        return res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Project not found' }
+        });
+      }
+
+      const [deptRes, distRes, mileRes, budgRes, progRes] = await Promise.all([
+        data.department_id ? supabase.from('departments').select('*').eq('id', data.department_id).single() : { data: null },
+        data.district_id ? supabase.from('districts').select('*').eq('id', data.district_id).single() : { data: null },
+        supabase.from('milestones').select('*').eq('project_id', id).order('order_num', { ascending: true }),
+        supabase.from('budgets').select('*').eq('project_id', id),
+        supabase.from('progress_updates').select('*').eq('project_id', id).order('created_at', { ascending: true }),
+      ]);
+
+      project = {
+        ...data,
+        department: deptRes.data || null,
+        district: distRes.data || null,
+        milestones: mileRes.data || [],
+        budgets: budgRes.data || [],
+        progress_updates: progRes.data || []
+      };
     }
 
     res.json({ success: true, data: project });
