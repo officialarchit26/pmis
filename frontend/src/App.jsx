@@ -1,93 +1,95 @@
-import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import AccessDenied from './pages/AccessDenied';
+import RoleRedirect from './pages/RoleRedirect';
+
+// Dashboard pages
+import Dashboard from './pages/Dashboard';
+import WorkerDashboard from './pages/WorkerDashboard';
+import ExecutiveDashboard from './pages/ExecutiveDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+
+// Feature pages
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
+import MapView from './pages/MapView';
+import Alerts from './pages/Alerts';
+
+// Management pages
+import Users from './pages/Users';
+import Departments from './pages/Departments';
+import Districts from './pages/Districts';
 
 function App() {
-  const [backendStatus, setBackendStatus] = useState('Checking...');
-  const [backendConnected, setBackendConnected] = useState(false);
-
-  useEffect(() => {
-    // Check if backend is reachable
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status === 'ok') {
-          setBackendStatus('Connected');
-          setBackendConnected(true);
-        } else {
-          setBackendStatus('Unavailable');
-        }
-      })
-      .catch(() => {
-        setBackendStatus('Disconnected');
-        setBackendConnected(false);
-      });
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto text-center">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-5xl font-bold text-gray-900 mb-3">
-              PMIS
-            </h1>
-            <p className="text-xl text-green-600">
-              Project Monitoring & Intelligence System 
-            </p>
-          </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/access-denied" element={<AccessDenied />} />
 
-          {/* Status Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div
-                className={`w-3 h-3 rounded-full ${
-                  backendConnected ? 'bg-green-500' : 'bg-yellow-500'
-                } animate-pulse`}
-              />
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Frontend Connected
-              </h2>
-            </div>
+          {/* Protected routes with Layout */}
+          <Route element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }>
+            {/* Root redirect based on role */}
+            <Route path="/" element={<RoleRedirect />} />
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-500 mb-1">Backend Status</p>
-              <p
-                className={`text-lg font-semibold ${
-                  backendConnected ? 'text-green-600' : 'text-yellow-600'
-                }`}
-              >
-                {backendStatus}
-              </p>
-            </div>
+            {/* Worker routes */}
+            <Route path="/worker" element={
+              <ProtectedRoute allowedRoles={['worker']}>
+                <WorkerDashboard />
+              </ProtectedRoute>
+            } />
 
-            <div className="mt-4 text-sm text-gray-500">
-              Phase 1 Setup Complete
-            </div>
-          </div>
+            {/* Official routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute allowedRoles={['official', 'senior_official', 'admin']}>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
 
-          {/* Info */}
-          <div className="bg-white/60 backdrop-blur rounded-lg p-6 text-left">
-            <h3 className="font-semibold text-gray-800 mb-3">
-              Next Steps
-            </h3>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-start gap-2">
-                <span className="text-primary-600">•</span>
-                <span>Configure Supabase credentials in backend/.env</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary-600">•</span>
-                <span>Database schema is ready in database/schema.sql</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary-600">•</span>
-                <span>Sample data available in data/seed/</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
+            {/* Executive routes */}
+            <Route path="/executive" element={
+              <ProtectedRoute allowedRoles={['senior_official', 'admin']}>
+                <ExecutiveDashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Admin routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Common routes */}
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/map" element={<MapView />} />
+            <Route path="/alerts" element={<Alerts />} />
+
+            {/* Management routes (admin) */}
+            <Route path="/users" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <Users />
+              </ProtectedRoute>
+            } />
+            <Route path="/departments" element={<Departments />} />
+            <Route path="/districts" element={<Districts />} />
+          </Route>
+
+          {/* Catch all */}
+          <Route path="*" element={<AccessDenied />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

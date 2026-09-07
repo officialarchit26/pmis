@@ -1,28 +1,29 @@
-// Projects routes
+// Projects routes with RBAC
 const express = require('express');
 const router = express.Router();
 const { getSupabase, isUsingMemoryStore, memoryStore } = require('../config/database');
+const { authenticateUser, requireRole, applyScopeFilter } = require('../middleware/auth');
 
-// GET /api/projects - List all projects
-router.get('/', async (req, res) => {
+// GET /api/projects - List projects (filtered by role)
+router.get('/', authenticateUser, async (req, res) => {
   try {
     const { status, department_id, district_id, search } = req.query;
-
     let projects;
 
     if (isUsingMemoryStore()) {
       projects = [...memoryStore.projects];
 
-      // Apply filters
-      if (status) {
-        projects = projects.filter(p => p.status === status);
+      // Apply role-based filtering
+      const user = req.user;
+      if (user.role === 'worker' || user.role === 'official') {
+        projects = projects.filter(p => p.department_id === user.department_id);
       }
-      if (department_id) {
-        projects = projects.filter(p => p.department_id === department_id);
-      }
-      if (district_id) {
-        projects = projects.filter(p => p.district_id === district_id);
-      }
+      // admin and senior_official see all
+
+      // Apply query filters
+      if (status) projects = projects.filter(p => p.status === status);
+      if (department_id) projects = projects.filter(p => p.department_id === department_id);
+      if (district_id) projects = projects.filter(p => p.district_id === district_id);
       if (search) {
         const searchLower = search.toLowerCase();
         projects = projects.filter(
@@ -42,9 +43,14 @@ router.get('/', async (req, res) => {
       const supabase = getSupabase();
       let query = supabase.from('projects').select('*');
 
+      // Apply role-based filtering
+      query = applyScopeFilter(query, req.user);
+
+      // Apply query filters
       if (status) query = query.eq('status', status);
       if (department_id) query = query.eq('department_id', department_id);
       if (district_id) query = query.eq('district_id', district_id);
+      if (search) query = query.ilike('name', `%${search}%`);
 
       const { data, error } = await query;
       if (error) throw error;
@@ -54,10 +60,105 @@ router.get('/', async (req, res) => {
     res.json({
       success: true,
       data: projects,
-      meta: {
-        total: projects.length
-      }
+      meta: { total: projects.length, role: req.user.role }
     });
+  } catch (error) {
+    console.error('Projects list error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message }
+    });
+  }
+});
+
+// GET /api/projects/my-projects - Worker's assigned projects
+router.get('/my-projects', authenticateUser, requireRole('worker', 'official', 'senior_official', 'admin'), async (req, res) => {
+  try {
+    const user = req.user;
+    let projects;
+
+    if (isUsingMemoryStore()) {
+      if (user.role === 'worker' || user.role === 'official') {
+        projects = memoryStore.projects.filter(p => p.department_id === user.department_id);
+      } else {
+        projects = memoryStore.projects;
+      }
+      projects = projects.map(p => ({
+        ...p,
+        department: memoryStore.getDepartmentById(p.department_id),
+        district: memoryStore.getDistrictById(p.district_id)
+      }));
+    } else {
+      const supabase = getSupabase();
+      let query = supabase.from('projects').select('*');
+      query = applyScopeFilter(query, user);
+      const { data, error } = await query;
+      if (error) throw error;
+      projects = data || [];
+    }
+
+    res.json({ success: true, data: projects, meta: { total: projects.length } });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message }
+    });
+  }
+});
+
+// GET /api/projects/department - Official's department projects
+router.get('/department', authenticateUser, requireRole('official', 'senior_official', 'admin'), async (req, res) => {
+  try {
+    const { department_id } = req.query;
+    let projects;
+
+    if (isUsingMemoryStore()) {
+      const filterDept = department_id || req.user.department_id;
+      projects = memoryStore.projects.filter(p => p.department_id === filterDept);
+      projects = projects.map(p => ({
+        ...p,
+        department: memoryStore.getDepartmentById(p.department_id),
+        district: memoryStore.getDistrictById(p.district_id)
+      }));
+    } else {
+      const supabase = getSupabase();
+      const filterDept = department_id || req.user.department_id;
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('department_id', filterDept);
+      if (error) throw error;
+      projects = data || [];
+    }
+
+    res.json({ success: true, data: projects, meta: { total: projects.length } });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: error.message }
+    });
+  }
+});
+
+// GET /api/projects/all - All projects (senior/admin)
+router.get('/all', authenticateUser, requireRole('senior_official', 'admin'), async (req, res) => {
+  try {
+    let projects;
+
+    if (isUsingMemoryStore()) {
+      projects = memoryStore.projects.map(p => ({
+        ...p,
+        department: memoryStore.getDepartmentById(p.department_id),
+        district: memoryStore.getDistrictById(p.district_id)
+      }));
+    } else {
+      const supabase = getSupabase();
+      const { data, error } = await supabase.from('projects').select('*');
+      if (error) throw error;
+      projects = data || [];
+    }
+
+    res.json({ success: true, data: projects, meta: { total: projects.length } });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -67,7 +168,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/projects/map-data - Projects with coordinates for map
-router.get('/map-data', async (req, res) => {
+router.get('/map-data', authenticateUser, async (req, res) => {
   try {
     let projects;
 
@@ -96,10 +197,7 @@ router.get('/map-data', async (req, res) => {
       projects = data || [];
     }
 
-    res.json({
-      success: true,
-      data: projects
-    });
+    res.json({ success: true, data: projects });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -109,7 +207,7 @@ router.get('/map-data', async (req, res) => {
 });
 
 // GET /api/projects/:id - Single project with details
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     let project;
@@ -123,7 +221,6 @@ router.get('/:id', async (req, res) => {
         });
       }
 
-      // Add related data
       const milestones = memoryStore.getMilestonesByProject(id);
       const budgets = memoryStore.getBudgetsByProject(id);
       const progressUpdates = memoryStore.getProgressByProject(id);
@@ -136,26 +233,16 @@ router.get('/:id', async (req, res) => {
         district,
         milestones,
         budgets,
-        progressUpdates
+        progress_updates: progressUpdates
       };
     } else {
       const supabase = getSupabase();
       const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
       if (error) throw error;
       project = data;
-
-      if (!project) {
-        return res.status(404).json({
-          success: false,
-          error: { code: 'NOT_FOUND', message: 'Project not found' }
-        });
-      }
     }
 
-    res.json({
-      success: true,
-      data: project
-    });
+    res.json({ success: true, data: project });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -164,25 +251,19 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/projects - Create project
-router.post('/', async (req, res) => {
+// POST /api/projects - Create project (admin only)
+router.post('/', authenticateUser, requireRole('admin', 'senior_official'), async (req, res) => {
   try {
     const projectData = req.body;
 
     if (isUsingMemoryStore()) {
       const newProject = memoryStore.addProject(projectData);
-      res.status(201).json({
-        success: true,
-        data: newProject
-      });
+      res.status(201).json({ success: true, data: newProject });
     } else {
       const supabase = getSupabase();
       const { data, error } = await supabase.from('projects').insert([projectData]).select();
       if (error) throw error;
-      res.status(201).json({
-        success: true,
-        data: data[0]
-      });
+      res.status(201).json({ success: true, data: data[0] });
     }
   } catch (error) {
     res.status(500).json({
@@ -192,8 +273,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/projects/:id - Update project
-router.put('/:id', async (req, res) => {
+// PUT /api/projects/:id - Update project (admin or official)
+router.put('/:id', authenticateUser, requireRole('admin', 'senior_official', 'official'), async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -206,10 +287,7 @@ router.put('/:id', async (req, res) => {
           error: { code: 'NOT_FOUND', message: 'Project not found' }
         });
       }
-      res.json({
-        success: true,
-        data: updated
-      });
+      res.json({ success: true, data: updated });
     } else {
       const supabase = getSupabase();
       const { data, error } = await supabase
@@ -218,10 +296,7 @@ router.put('/:id', async (req, res) => {
         .eq('id', id)
         .select();
       if (error) throw error;
-      res.json({
-        success: true,
-        data: data[0]
-      });
+      res.json({ success: true, data: data[0] });
     }
   } catch (error) {
     res.status(500).json({
@@ -232,7 +307,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // GET /api/projects/:id/progress - Get progress history
-router.get('/:id/progress', async (req, res) => {
+router.get('/:id/progress', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     let progress;
@@ -250,10 +325,7 @@ router.get('/:id/progress', async (req, res) => {
       progress = data || [];
     }
 
-    res.json({
-      success: true,
-      data: progress
-    });
+    res.json({ success: true, data: progress });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -262,43 +334,31 @@ router.get('/:id/progress', async (req, res) => {
   }
 });
 
-// POST /api/projects/:id/progress - Add progress update
-router.post('/:id/progress', async (req, res) => {
+// POST /api/projects/:id/progress - Add progress update (worker, official)
+router.post('/:id/progress', authenticateUser, requireRole('worker', 'official', 'senior_official', 'admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const { progress_percent, notes } = req.body;
 
     if (isUsingMemoryStore()) {
       const update = memoryStore.addProgressUpdate(id, { progress_percent, notes });
-
-      // Also update the project progress
       memoryStore.updateProject(id, { progress_percent });
-
-      res.status(201).json({
-        success: true,
-        data: update
-      });
+      res.status(201).json({ success: true, data: update });
     } else {
       const supabase = getSupabase();
-
-      // Add progress update
       const { data: progressData, error: progressError } = await supabase
         .from('progress_updates')
-        .insert([{ project_id: id, progress_percent, notes }])
+        .insert([{ project_id: id, progress_percent, notes, updated_by: req.user.id }])
         .select();
       if (progressError) throw progressError;
 
-      // Update project progress
       const { error: projectError } = await supabase
         .from('projects')
         .update({ progress_percent })
         .eq('id', id);
       if (projectError) throw projectError;
 
-      res.status(201).json({
-        success: true,
-        data: progressData[0]
-      });
+      res.status(201).json({ success: true, data: progressData[0] });
     }
   } catch (error) {
     res.status(500).json({

@@ -4,7 +4,7 @@
 -- Complete MVP Schema
 -- ============================================
 
--- Enable UUID extension
+-- Enable UUID extension                                                                                                                                                                                                                                                                                                                                                                                                                                        
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================

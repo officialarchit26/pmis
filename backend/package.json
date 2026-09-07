@@ -1,7 +1,7 @@
 {
-  "name": "project-pulse-backend",
+  "name": "pmis-backend",
   "version": "1.0.0",
-  "description": "Project Pulse Backend - Express API server",
+  "description": "PMIS Backend - Project Monitoring & Intelligence System API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/server": "^1.5.3",
     "@supabase/supabase-js": "^2.45.4",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

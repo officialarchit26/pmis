@@ -14,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 // Import routes
+const authRoutes = require('./routes/auth.routes');
 const healthRoutes = require('./routes/health.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const projectsRoutes = require('./routes/projects.routes');
@@ -23,7 +24,8 @@ const alertsRoutes = require('./routes/alerts.routes');
 const aiRoutes = require('./routes/ai.routes');
 
 // API Routes
-app.use('/api', healthRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/health', healthRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/departments', departmentsRoutes);

@@ -3,20 +3,21 @@ const express = require('express');
 const router = express.Router();
 const { getSupabase } = require('../config/database');
 
-// Basic health check
-router.get('/health', (req, res) => {
+// Basic health check - mounted at /api/health, so just define '/'
+router.get('/', (req, res) => {
   res.json({
     success: true,
     data: {
       status: 'ok',
-      service: 'project-pulse-backend',
+      service: 'PMIS Backend',
+      version: '1.0.0',
       timestamp: new Date().toISOString()
     }
   });
 });
 
 // Full health check with database
-router.get('/health/full', async (req, res) => {
+router.get('/full', async (req, res) => {
   let dbStatus = 'not_configured';
 
   try {
@@ -33,7 +34,7 @@ router.get('/health/full', async (req, res) => {
     success: true,
     data: {
       status: 'ok',
-      service: 'project-pulse-backend',
+      service: 'PMIS Backend',
       timestamp: new Date().toISOString(),
       database: {
         provider: 'Supabase',

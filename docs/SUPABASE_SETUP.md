@@ -26,9 +26,9 @@ After project is created:
 | Variable | Location |
 |----------|----------|
 | `SUPABASE_URL` | "Project URL" field |
-| `SUPABASE_SERVICE_ROLE_KEY` | "service_role" secret under "Project API keys" |
+| `SUPABASE_SECRET_KEY` | "secret" key under "Project API keys" (newer key system) |
 
-**⚠️ Important**: Use the `service_role` key for the backend. The `anon` key is for frontend only.
+**⚠️ Important**: Use the `secret` key for the backend. It is the modern replacement for `service_role`. The `anon`/`publishable` key is for frontend only.
 
 ## Step 4: Configure Backend
 

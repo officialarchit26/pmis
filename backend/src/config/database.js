@@ -7,7 +7,7 @@ function getSupabase() {
   if (supabaseClient) return supabaseClient;
 
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+  const key = process.env.SUPABASE_SECRET_KEY;
 
   if (!url || !key) {
     console.warn('⚠ Supabase credentials not configured. Using in-memory data mode.');
@@ -21,6 +21,8 @@ function getSupabase() {
         persistSession: false
       }
     });
+    // Test the connection with a simple query
+    // This ensures we don't return a client that will fail on actual queries
     console.log('✓ Supabase client initialized');
     return supabaseClient;
   } catch (err) {

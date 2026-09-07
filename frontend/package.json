@@ -1,7 +1,7 @@
 {
-  "name": "project-pulse-frontend",
-  "version": "0.1.0",
-  "description": "Project Pulse Frontend - React application",
+  "name": "pmis-frontend",
+  "version": "1.0.0",
+  "description": "PMIS Frontend - Project Monitoring & Intelligence System",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "recharts": "^2.13.3",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

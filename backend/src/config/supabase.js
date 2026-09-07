@@ -11,11 +11,11 @@ function getSupabaseClient() {
   }
 
   const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SECRET_KEY;
 
   if (!url || !serviceKey) {
     console.warn(
-      '⚠ Supabase credentials not found. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env'
+      '⚠ Supabase credentials not found. Set SUPABASE_URL and SUPABASE_SECRET_KEY in backend/.env'
     );
     return null;
   }

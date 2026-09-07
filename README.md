@@ -1,37 +1,35 @@
-# Project Pulse
+# PMIS - Project Monitoring & Intelligence System
 
-> Government Project Monitoring Platform
+> Government Project Monitoring Platform with Role-Based Access Control
 
 ## ⚠️ DEMO DATA
 
 All data in `data/` folder is **SYNTHETIC / DEMO** data. Not real government data.
 
+## Features
+
+- **Role-Based Access Control (RBAC)** with 4 user roles:
+  - **Worker** - Limited access to assigned projects
+  - **Official** - Department-level monitoring
+  - **Senior Official** - State-wide analytics
+  - **Admin** - Full system access
+
+- **Dashboard** - Real-time KPIs and project analytics
+- **Project Management** - Track progress, budgets, milestones
+- **Interactive Map** - Geographic project visualization
+- **Alerts System** - Risk and delay notifications
+- **Department/District Management** - Organizational oversight
+
 ## Technology Stack
 
 | Component  | Technology                  |
-|------------|------------------------------|
-| Frontend   | React 18 + Vite + Tailwind  |
-| Backend    | Node.js + Express.js         |
-| Database   | PostgreSQL (Supabase)        |
-| AI Engine  | Google Gemini API (future)    |
-| Data       | JSON seed files             |
-
-## Current Phase
-
-**Phase 1 & 2: Setup** — In Progress
-
-## Project Structure
-
-```
-project-pulse/
-├── frontend/          # React app
-├── backend/         # Express API
-├── database/        # PostgreSQL schema
-├── data/            # Seed data
-│   ├── seed/       # Database seed files
-│   └── sample/     # Sample data
-└── docs/           # Documentation
-```
+|------------|-----------------------------|
+| Frontend   | React 18 + Vite + Tailwind |
+| Backend    | Node.js + Express.js       |
+| Database   | PostgreSQL (Supabase)       |
+| Maps       | Leaflet + OpenStreetMap     |
+| Charts     | Recharts                   |
+| Auth       | Supabase Auth / JWT        |
 
 ## Quick Start
 
@@ -53,32 +51,91 @@ npm run dev
 # Open: http://localhost:5173
 ```
 
-## Supabase Setup
+### Demo Accounts
 
-See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for detailed instructions.
+| Role | Email | Password |
+|------|-------|----------|
+| Worker | worker@pmis.demo | any |
+| Official | official@pmis.demo | any |
+| Senior Official | senior@pmis.demo | any |
+| Admin | admin@pmis.demo | any |
 
-### Required Values
+## Project Structure
 
-| Variable | Where to Get It |
-|----------|-----------------|
-| `SUPABASE_URL` | Supabase Dashboard → Settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Settings → API |
+```
+pmis/
+├── frontend/          # React app (Vite)
+│   ├── src/
+│   │   ├── components/  # Reusable UI components
+│   │   ├── contexts/    # React contexts (Auth)
+│   │   ├── pages/      # Page components
+│   │   └── services/   # API service layer
+│   └── ...
+├── backend/           # Express API
+│   ├── src/
+│   │   ├── config/    # Database config
+│   │   ├── middleware/ # Auth middleware
+│   │   ├── routes/    # API routes
+│   │   └── services/  # Business logic
+│   └── ...
+├── database/         # PostgreSQL schema
+├── data/             # Seed data
+└── docs/             # Documentation
+```
 
-## Database
+## Environment Variables
 
-Schema: `database/schema.sql`
+### Backend (`backend/.env`)
 
-Tables:
-- departments, districts, users
-- projects, milestones, budgets
-- risk_assessments, reports, chat_sessions, chat_messages
+```env
+PORT=3001
+NODE_ENV=development
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SECRET_KEY=your-secret-key
+```
+
+### Frontend (`frontend/.env.local`)
+
+```env
+VITE_API_URL=http://localhost:3001
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for detailed Supabase setup.
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - Login
+- `POST /api/auth/logout` - Logout
+- `GET /api/auth/me` - Current user
+
+### Dashboard
+- `GET /api/dashboard/summary` - Dashboard KPIs
+
+### Projects
+- `GET /api/projects` - List projects (filtered by role)
+- `GET /api/projects/:id` - Project details
+- `GET /api/projects/map-data` - Map coordinates
+- `POST /api/projects` - Create project (admin)
+- `PUT /api/projects/:id` - Update project
+
+### Other
+- `GET /api/departments` - List departments
+- `GET /api/districts` - List districts
+- `GET /api/alerts` - List alerts
 
 ## Development Phases
 
 - [x] Phase 1: Project Setup
 - [x] Phase 2: Database & Seed Data
-- [ ] Phase 3: Backend API
-- [ ] Phase 4: Frontend Dashboard
-- [ ] Phase 5: Map Integration
-- [ ] Phase 6: AI Integration
+- [x] Phase 3: Backend API with RBAC
+- [x] Phase 4: Frontend Dashboard & UI
+- [x] Phase 5: Map Integration
+- [ ] Phase 6: AI Integration (planned)
 - [ ] Phase 7: Testing & Deployment
+
+## License
+
+ISC
