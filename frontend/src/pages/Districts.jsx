@@ -33,13 +33,20 @@ export default function Districts() {
   if (loading) return <LoadingSpinner message="Loading districts..." />;
   if (error) return <ErrorMessage message={error} onRetry={loadData} />;
 
-  const getDistrictStats = (distId) => {
-    const distProjects = projects.filter(p => p.district_id === distId);
+  const getDistrictStats = (dist) => {
+    if (dist && dist.project_count !== undefined) {
+      return {
+        count: dist.project_count,
+        totalBudget: dist.total_budget || 0,
+        avgProgress: dist.avg_progress || 0,
+      };
+    }
+    const distProjects = projects.filter(p => p.district_id === (dist?.id || dist));
     return {
       count: distProjects.length,
       totalBudget: distProjects.reduce((sum, p) => sum + (p.budget_total || 0), 0),
       avgProgress: distProjects.length > 0
-        ? Math.round(distProjects.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / distProjects.length)
+        ? Math.round((distProjects.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / distProjects.length) * 10) / 10
         : 0,
     };
   };

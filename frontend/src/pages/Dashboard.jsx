@@ -73,7 +73,7 @@ export default function Dashboard() {
         />
         <KPICard
           title="Ongoing"
-          value={kpis?.active_projects || 0}
+          value={kpis?.ongoing_projects ?? kpis?.active_projects ?? 0}
           icon="🔄"
           color="green"
         />

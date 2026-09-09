@@ -227,7 +227,7 @@ async function seed() {
         is_resolved: false
       });
     }
-    if (proj.budget_utilized / proj.budget_total > 0.8) {
+    if (proj.status !== 'completed' && proj.budget_utilized / proj.budget_total > 0.8) {
       alerts.push({
         id: stringToUUID(`alert-budget-${idx}`),
         project_id: proj.id,

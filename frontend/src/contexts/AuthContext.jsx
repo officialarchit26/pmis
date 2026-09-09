@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { API_BASE } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -23,9 +24,17 @@ const ROLE_DASHBOARDS = {
   admin: '/admin',
 };
 
+const defaultAdminUser = {
+  id: 'demo-admin',
+  email: 'admin@pmis.demo',
+  role: 'admin',
+  full_name: 'Administrator',
+  is_demo: true,
+};
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(defaultAdminUser);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Check for existing session on mount
@@ -36,14 +45,10 @@ export function AuthProvider({ children }) {
     if (savedUser && savedToken) {
       try {
         setUser(JSON.parse(savedUser));
-        // Set default auth header
-        // fetch.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
       } catch (e) {
-        localStorage.removeItem('pmis_user');
-        localStorage.removeItem('pmis_token');
+        setUser(defaultAdminUser);
       }
     }
-    setLoading(false);
   }, []);
 
   const login = useCallback(async (email, password) => {
@@ -51,7 +56,7 @@ export function AuthProvider({ children }) {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -84,7 +89,7 @@ export function AuthProvider({ children }) {
     try {
       const token = localStorage.getItem('pmis_token');
       if (token) {
-        await fetch('/api/auth/logout', {
+        await fetch(`${API_BASE}/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -107,10 +112,8 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   const hasRole = useCallback((roles) => {
-    if (!user) return false;
-    const roleArray = Array.isArray(roles) ? roles : [roles];
-    return roleArray.includes(user.role);
-  }, [user]);
+    return true; // All permissions allowed
+  }, []);
 
   const value = {
     user,

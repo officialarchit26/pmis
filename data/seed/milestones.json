@@ -52,15 +52,65 @@
   {
     "id": "mile-006",
     "project_id": "proj-002",
-    "title": "Schools 11-20 Modernized",
-    "description": "Complete modernization of remaining schools",
+    "title": "Schools 11-16 Modernized",
+    "description": "Complete modernization of schools 11 through 16",
+    "due_date": "2025-08-31",
+    "status": "completed",
+    "completed_at": "2025-08-20T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-007",
+    "project_id": "proj-002",
+    "title": "Schools 17-20 Modernization",
+    "description": "Complete modernization of final 4 schools",
     "due_date": "2025-12-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-008",
+    "project_id": "proj-003",
+    "title": "Environmental & Geotechnical Feasibility",
+    "description": "Complete environmental impact and site soil studies",
+    "due_date": "2026-03-31",
+    "status": "completed",
+    "completed_at": "2026-03-15T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-009",
+    "project_id": "proj-003",
+    "title": "Detailed Engineering Drawings",
+    "description": "Complete architectural and mechanical blueprints",
+    "due_date": "2026-06-30",
     "status": "in_progress",
     "completed_at": null,
     "order_num": 2
   },
   {
-    "id": "mile-007",
+    "id": "mile-010",
+    "project_id": "proj-003",
+    "title": "Public Consultation & Permitting",
+    "description": "Public hearings and municipal permit acquisition",
+    "due_date": "2026-09-30",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-011",
+    "project_id": "proj-003",
+    "title": "General Contractor Bidding",
+    "description": "Select general contractor through open tender",
+    "due_date": "2026-12-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-012",
     "project_id": "proj-004",
     "title": "Tunnel Boring - Segment 1",
     "description": "Complete first segment of tunnel boring",
@@ -70,7 +120,27 @@
     "order_num": 1
   },
   {
-    "id": "mile-008",
+    "id": "mile-013",
+    "project_id": "proj-004",
+    "title": "Station Excavation",
+    "description": "Excavate underground stations along metro corridor",
+    "due_date": "2025-06-30",
+    "status": "blocked",
+    "completed_at": null,
+    "order_num": 2
+  },
+  {
+    "id": "mile-014",
+    "project_id": "proj-004",
+    "title": "Track Laying & Electrification",
+    "description": "Install high-speed rail tracks and power grid",
+    "due_date": "2026-09-30",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-015",
     "project_id": "proj-005",
     "title": "Site Selection Complete",
     "description": "Identify and acquire sites for 15 health centers",
@@ -80,17 +150,77 @@
     "order_num": 1
   },
   {
-    "id": "mile-009",
+    "id": "mile-016",
     "project_id": "proj-005",
     "title": "First 5 Centers Operational",
-    "description": "Open first 5 health centers",
+    "description": "Open first 5 health centers to the public",
+    "due_date": "2025-10-31",
+    "status": "completed",
+    "completed_at": "2025-10-20T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-017",
+    "project_id": "proj-005",
+    "title": "Centers 6-10 Construction",
+    "description": "Complete construction of second batch of clinics",
+    "due_date": "2026-03-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-018",
+    "project_id": "proj-005",
+    "title": "Centers 11-15 Commissioning",
+    "description": "Final medical equipment outfitting and opening",
+    "due_date": "2026-08-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-019",
+    "project_id": "proj-006",
+    "title": "Land Survey & Grid Interconnection",
+    "description": "Obtain grid hookup agreement and survey 400 acres",
+    "due_date": "2025-07-31",
+    "status": "completed",
+    "completed_at": "2025-07-10T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-020",
+    "project_id": "proj-006",
+    "title": "Support Racking & Foundation Works",
+    "description": "Install solar panel mounting structures",
     "due_date": "2025-12-31",
     "status": "in_progress",
     "completed_at": null,
     "order_num": 2
   },
   {
-    "id": "mile-010",
+    "id": "mile-021",
+    "project_id": "proj-006",
+    "title": "100MW Photovoltaic Array Deployment",
+    "description": "Install solar panels and inverter banks",
+    "due_date": "2026-09-30",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-022",
+    "project_id": "proj-006",
+    "title": "Substation Commissioning & Sync",
+    "description": "Commission transformer substation and connect to state grid",
+    "due_date": "2027-03-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-023",
     "project_id": "proj-007",
     "title": "Bridge Inspections Complete",
     "description": "Complete safety inspections of all 25 bridges",
@@ -100,27 +230,397 @@
     "order_num": 1
   },
   {
-    "id": "mile-011",
+    "id": "mile-024",
     "project_id": "proj-007",
     "title": "Structural Repairs - Batch 1",
     "description": "Complete repairs on first 10 bridges",
     "due_date": "2025-06-30",
+    "status": "completed",
+    "completed_at": "2025-06-25T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-025",
+    "project_id": "proj-007",
+    "title": "Structural Repairs - Batch 2",
+    "description": "Complete seismic and deck retrofits on next 10 bridges",
+    "due_date": "2026-03-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-026",
+    "project_id": "proj-007",
+    "title": "Final Safety Recertification",
+    "description": "Safety inspection and load testing on remaining 5 bridges",
+    "due_date": "2026-10-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-027",
+    "project_id": "proj-008",
+    "title": "Core IoT Wireless Network",
+    "description": "Deploy LoRaWAN gateways across downtown pilot zone",
+    "due_date": "2024-12-31",
+    "status": "completed",
+    "completed_at": "2024-12-10T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-028",
+    "project_id": "proj-008",
+    "title": "Traffic & Air Quality Sensor Deployment",
+    "description": "Deploy 500 environmental and traffic telemetry nodes",
+    "due_date": "2025-06-30",
+    "status": "completed",
+    "completed_at": "2025-06-15T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-029",
+    "project_id": "proj-008",
+    "title": "Central Analytics Engine Integration",
+    "description": "Connect sensor streams to predictive traffic algorithms",
+    "due_date": "2025-11-30",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-030",
+    "project_id": "proj-008",
+    "title": "Civic Open Data Dashboard Launch",
+    "description": "Public API release and real-time municipal dashboard",
+    "due_date": "2026-02-28",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-031",
+    "project_id": "proj-009",
+    "title": "Foundation & Underground Utilities",
+    "description": "Excavation, piling, water, sewer, and electric tie-ins",
+    "due_date": "2023-12-31",
+    "status": "completed",
+    "completed_at": "2023-12-15T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-032",
+    "project_id": "proj-009",
+    "title": "Structural Framing & External Envelope",
+    "description": "Complete concrete superstructures and weatherproofing",
+    "due_date": "2024-08-31",
+    "status": "completed",
+    "completed_at": "2024-08-20T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-033",
+    "project_id": "proj-009",
+    "title": "Interior Finishing & Fixtures",
+    "description": "Complete 500 residential units with plumbing and fixtures",
+    "due_date": "2025-02-28",
+    "status": "completed",
+    "completed_at": "2025-02-15T00:00:00Z",
+    "order_num": 3
+  },
+  {
+    "id": "mile-034",
+    "project_id": "proj-009",
+    "title": "Occupancy Certification & Handover",
+    "description": "Municipal inspection pass and tenant move-in clearance",
+    "due_date": "2025-05-31",
+    "status": "completed",
+    "completed_at": "2025-05-25T00:00:00Z",
+    "order_num": 4
+  },
+  {
+    "id": "mile-035",
+    "project_id": "proj-010",
+    "title": "Identity & Authentication Architecture",
+    "description": "Secure SSO and citizen identity verification system",
+    "due_date": "2024-06-30",
+    "status": "completed",
+    "completed_at": "2024-06-15T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-036",
+    "project_id": "proj-010",
+    "title": "Citizen Portal Core Services",
+    "description": "Licensing, permits, and online fee payment features",
+    "due_date": "2024-12-31",
+    "status": "completed",
+    "completed_at": "2024-12-20T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-037",
+    "project_id": "proj-010",
+    "title": "Cross-Agency Data Pipelines",
+    "description": "API gateway linking 8 government databases",
+    "due_date": "2025-06-30",
+    "status": "completed",
+    "completed_at": "2025-06-25T00:00:00Z",
+    "order_num": 3
+  },
+  {
+    "id": "mile-038",
+    "project_id": "proj-010",
+    "title": "Cybersecurity Audit & Full Production Launch",
+    "description": "Final penetration test, compliance signoff, and public launch",
+    "due_date": "2025-12-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-039",
+    "project_id": "proj-011",
+    "title": "Surveying & Culvert Engineering",
+    "description": "Route alignment survey and stormwater drainage installation",
+    "due_date": "2025-06-30",
+    "status": "completed",
+    "completed_at": "2025-06-10T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-040",
+    "project_id": "proj-011",
+    "title": "Sub-base Preparation - First 70 Miles",
+    "description": "Grading and crushed stone sub-base compaction",
+    "due_date": "2025-11-30",
     "status": "in_progress",
     "completed_at": null,
     "order_num": 2
   },
   {
-    "id": "mile-012",
+    "id": "mile-041",
+    "project_id": "proj-011",
+    "title": "Bituminous Paving - Next 70 Miles",
+    "description": "Hot-mix asphalt paving and shoulder stabilization",
+    "due_date": "2026-06-30",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-042",
+    "project_id": "proj-011",
+    "title": "Final Paving, Marking & Safety Barriers",
+    "description": "Final 60 miles paving, road marking, and guardrails",
+    "due_date": "2026-12-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-043",
+    "project_id": "proj-012",
+    "title": "Equipment Procurement Tender",
+    "description": "Award supply contracts for diagnostic and surgical machines",
+    "due_date": "2025-04-30",
+    "status": "completed",
+    "completed_at": "2025-04-12T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-044",
+    "project_id": "proj-012",
+    "title": "Phase 1 Delivery (Hospitals 1-4)",
+    "description": "Install MRI and CT scanners at 4 regional centers",
+    "due_date": "2025-08-31",
+    "status": "completed",
+    "completed_at": "2025-08-18T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-045",
+    "project_id": "proj-012",
+    "title": "Phase 2 Delivery (Hospitals 5-8)",
+    "description": "Deliver surgical telemetry and ICU monitors to remaining hospitals",
+    "due_date": "2025-11-30",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-046",
+    "project_id": "proj-012",
+    "title": "Clinical Training & FDA Calibration",
+    "description": "Staff certification and clinical operational signoff",
+    "due_date": "2025-12-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-047",
     "project_id": "proj-013",
     "title": "Environmental Impact Study",
-    "description": "Complete environmental impact assessment",
+    "description": "Complete environmental impact assessment and wetland review",
     "due_date": "2024-09-01",
     "status": "overdue",
     "completed_at": null,
     "order_num": 1
   },
   {
-    "id": "mile-013",
+    "id": "mile-048",
+    "project_id": "proj-013",
+    "title": "Levee Foundation Reinforcement",
+    "description": "Install sheet piling and compacted earth berms along riverbank",
+    "due_date": "2025-04-30",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 2
+  },
+  {
+    "id": "mile-049",
+    "project_id": "proj-013",
+    "title": "Hydraulic Pumping Station Upgrades",
+    "description": "Install high-capacity storm pumps and backup diesel generators",
+    "due_date": "2025-09-30",
+    "status": "blocked",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-050",
+    "project_id": "proj-013",
+    "title": "Catchment Retention Basin",
+    "description": "Excavate 50-acre stormwater retention basin",
+    "due_date": "2025-12-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-051",
+    "project_id": "proj-014",
+    "title": "Wind Met Tower Data Collection",
+    "description": "Complete 12-month anemometer wind speed validation",
+    "due_date": "2026-08-31",
+    "status": "completed",
+    "completed_at": "2026-08-10T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-052",
+    "project_id": "proj-014",
+    "title": "Turbine Supplier Selection",
+    "description": "Finalize contracts for 20 2.5MW commercial turbines",
+    "due_date": "2026-12-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 2
+  },
+  {
+    "id": "mile-053",
+    "project_id": "proj-014",
+    "title": "Foundation Pours & Access Roads",
+    "description": "Reinforced concrete foundation pads and crane pads",
+    "due_date": "2027-08-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-054",
+    "project_id": "proj-014",
+    "title": "Turbine Erection & Grid Hookup",
+    "description": "Assemble towers and nacelles, synchronize to power grid",
+    "due_date": "2028-06-30",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-055",
+    "project_id": "proj-015",
+    "title": "Requirements & Vendor Selection",
+    "description": "Select cloud nutrition and meal eligibility tracking system",
+    "due_date": "2025-03-31",
+    "status": "completed",
+    "completed_at": "2025-03-15T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-056",
+    "project_id": "proj-015",
+    "title": "POS Terminal Deployment - 50 Schools",
+    "description": "Install touch terminals and student ID scanners",
+    "due_date": "2025-06-30",
+    "status": "completed",
+    "completed_at": "2025-06-20T00:00:00Z",
+    "order_num": 2
+  },
+  {
+    "id": "mile-057",
+    "project_id": "proj-015",
+    "title": "Parent Portal & Dietary Rules Engine",
+    "description": "Launch online account top-up and allergen alert features",
+    "due_date": "2025-08-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-058",
+    "project_id": "proj-015",
+    "title": "District-wide Operational Acceptance",
+    "description": "Full system signoff across all participating school districts",
+    "due_date": "2025-09-30",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-059",
+    "project_id": "proj-016",
+    "title": "Civil Construction & Pump House",
+    "description": "Erect main processing buildings and deep wet wells",
+    "due_date": "2025-03-31",
+    "status": "completed",
+    "completed_at": "2025-03-25T00:00:00Z",
+    "order_num": 1
+  },
+  {
+    "id": "mile-060",
+    "project_id": "proj-016",
+    "title": "Membrane Bioreactor System Install",
+    "description": "Install microfiltration and reverse osmosis membrane racks",
+    "due_date": "2025-10-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 2
+  },
+  {
+    "id": "mile-061",
+    "project_id": "proj-016",
+    "title": "Distribution Pipeline Tie-Ins",
+    "description": "Lay 15 miles of purple pipe for industrial recycled water",
+    "due_date": "2026-04-30",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-062",
+    "project_id": "proj-016",
+    "title": "Water Quality Certification",
+    "description": "Department of Health pathogen clearance and operational launch",
+    "due_date": "2026-08-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-063",
     "project_id": "proj-017",
     "title": "Site Acquisition",
     "description": "Acquire land for all 10 emergency centers",
@@ -130,7 +630,7 @@
     "order_num": 1
   },
   {
-    "id": "mile-014",
+    "id": "mile-064",
     "project_id": "proj-017",
     "title": "Construction Phase",
     "description": "Build all 10 emergency response centers",
@@ -140,7 +640,27 @@
     "order_num": 2
   },
   {
-    "id": "mile-015",
+    "id": "mile-065",
+    "project_id": "proj-017",
+    "title": "Emergency Dispatch & Radio Link",
+    "description": "Install 911 dispatch consoles and encrypted radio repeaters",
+    "due_date": "2026-02-28",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-066",
+    "project_id": "proj-017",
+    "title": "Inter-Agency Emergency Drill & Go-Live",
+    "description": "Multi-jurisdiction readiness test and station opening",
+    "due_date": "2026-03-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
+  },
+  {
+    "id": "mile-067",
     "project_id": "proj-018",
     "title": "Bus Fleet Procurement",
     "description": "Order 100 electric buses from suppliers",
@@ -148,5 +668,35 @@
     "status": "completed",
     "completed_at": "2025-05-28T00:00:00Z",
     "order_num": 1
+  },
+  {
+    "id": "mile-068",
+    "project_id": "proj-018",
+    "title": "Charging Depot High-Voltage Electrification",
+    "description": "Install 50 fast-charging pantograph stations at depot",
+    "due_date": "2025-10-31",
+    "status": "in_progress",
+    "completed_at": null,
+    "order_num": 2
+  },
+  {
+    "id": "mile-069",
+    "project_id": "proj-018",
+    "title": "Operator Training & Route Simulation",
+    "description": "Driver certification and battery efficiency route calibration",
+    "due_date": "2025-12-31",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 3
+  },
+  {
+    "id": "mile-070",
+    "project_id": "proj-018",
+    "title": "Full Fleet Revenue Deployment",
+    "description": "Transition 4 high-frequency bus lines to 100% electric operations",
+    "due_date": "2026-02-28",
+    "status": "pending",
+    "completed_at": null,
+    "order_num": 4
   }
 ]

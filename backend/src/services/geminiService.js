@@ -1,7 +1,7 @@
 // Gemini AI Service
 // Handles communication with Google's Gemini API
 
-const MODELS = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-2.5-pro'];
+const MODELS = ['gemini-flash-latest', 'gemini-3.6-flash', 'gemini-pro-latest'];
 
 /**
  * Strips markdown code block wrappers and parses JSON safely
@@ -9,15 +9,33 @@ const MODELS = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-2.5-pro'];
 function parseStructuredJson(text) {
   if (!text || typeof text !== 'string') return null;
   let cleaned = text.trim();
-  if (cleaned.startsWith('```json')) {
-    cleaned = cleaned.slice(7);
-  } else if (cleaned.startsWith('```')) {
-    cleaned = cleaned.slice(3);
+
+  // 1. Try markdown code block extraction
+  const jsonBlockMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  if (jsonBlockMatch) {
+    try {
+      return JSON.parse(jsonBlockMatch[1].trim());
+    } catch (e) {
+      cleaned = jsonBlockMatch[1].trim();
+    }
   }
-  if (cleaned.endsWith('```')) {
-    cleaned = cleaned.slice(0, -3);
+
+  // 2. Direct JSON parse
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    // 3. Fallback: locate outermost braces
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      try {
+        return JSON.parse(cleaned.substring(firstBrace, lastBrace + 1));
+      } catch (braceErr) {
+        return null;
+      }
+    }
+    return null;
   }
-  return JSON.parse(cleaned.trim());
 }
 
 /**
@@ -52,6 +70,7 @@ Instructions:
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(25000),
           body: JSON.stringify({
             contents: [{
               parts: [{ text: fullPrompt }]
@@ -129,6 +148,7 @@ Return ONLY the raw JSON object, without markdown formatting or code fences.`;
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(25000),
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {

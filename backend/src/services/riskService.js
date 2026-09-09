@@ -1,52 +1,67 @@
 // Risk Analysis Service
-// Calculates risk scores based on project data
+// Grounded in actual project data from the database
 
 function calculateRiskScore(project) {
+  const isCompleted = project.status === 'completed' || Number(project.progress_percent) >= 100;
   const factors = [];
   const recommendations = [];
-  let riskScore = 0;
+  let computedScore = 0;
 
-  // 1. Schedule Risk (30 points max)
-  const scheduleRisk = calculateScheduleRisk(project);
-  riskScore += scheduleRisk.score;
-  factors.push(...scheduleRisk.factors);
-  recommendations.push(...scheduleRisk.recommendations);
+  if (isCompleted) {
+    factors.push('Project successfully completed (100% physical progress)');
+    factors.push(`Final budget utilization: $${Number(project.budget_utilized || 0).toLocaleString()} of $${Number(project.budget_total || 0).toLocaleString()}`);
+    recommendations.push('Conduct final post-completion asset handover audit');
+    recommendations.push('Archive closeout documentation in PMIS records');
+    computedScore = 15;
+  } else {
+    // 1. Schedule Risk
+    const scheduleRisk = calculateScheduleRisk(project);
+    computedScore += scheduleRisk.score;
+    factors.push(...scheduleRisk.factors);
+    recommendations.push(...scheduleRisk.recommendations);
 
-  // 2. Budget Risk (25 points max)
-  const budgetRisk = calculateBudgetRisk(project);
-  riskScore += budgetRisk.score;
-  factors.push(...budgetRisk.factors);
-  recommendations.push(...budgetRisk.recommendations);
+    // 2. Budget Risk
+    const budgetRisk = calculateBudgetRisk(project);
+    computedScore += budgetRisk.score;
+    factors.push(...budgetRisk.factors);
+    recommendations.push(...budgetRisk.recommendations);
 
-  // 3. Milestone Risk (25 points max)
-  const milestoneRisk = calculateMilestoneRisk(project);
-  riskScore += milestoneRisk.score;
-  factors.push(...milestoneRisk.factors);
-  recommendations.push(...milestoneRisk.recommendations);
+    // 3. Milestone Risk
+    const milestoneRisk = calculateMilestoneRisk(project);
+    computedScore += milestoneRisk.score;
+    factors.push(...milestoneRisk.factors);
+    recommendations.push(...milestoneRisk.recommendations);
 
-  // 4. Status Risk (20 points max)
-  const statusRisk = calculateStatusRisk(project);
-  riskScore += statusRisk.score;
-  factors.push(...statusRisk.factors);
-  recommendations.push(...statusRisk.recommendations);
+    // 4. Status Risk
+    const statusRisk = calculateStatusRisk(project);
+    computedScore += statusRisk.score;
+    factors.push(...statusRisk.factors);
+    recommendations.push(...statusRisk.recommendations);
 
-  // Cap at 100
-  riskScore = Math.min(100, Math.max(0, riskScore));
+    computedScore = Math.min(100, Math.max(0, computedScore));
+  }
 
-  // Determine risk level
+  // Consistent with database risk_score if present, or computed score if absent
+  const riskScore =
+    project.risk_score !== undefined && project.risk_score !== null
+      ? Number(project.risk_score)
+      : computedScore;
+
+  // Determine risk level based on standardized thresholds
   let riskLevel;
   if (riskScore <= 25) riskLevel = 'LOW';
   else if (riskScore <= 50) riskLevel = 'MEDIUM';
   else if (riskScore <= 75) riskLevel = 'HIGH';
   else riskLevel = 'CRITICAL';
 
-  // Limit recommendations to top 5
+  // Limit recommendations and factors to top 5 unique entries
+  const topFactors = [...new Set(factors)].slice(0, 5);
   const topRecommendations = [...new Set(recommendations)].slice(0, 5);
 
   return {
     riskScore,
     riskLevel,
-    factors: [...new Set(factors)].slice(0, 5),
+    factors: topFactors,
     recommendations: topRecommendations,
     analyzedAt: new Date().toISOString()
   };
@@ -68,37 +83,35 @@ function calculateScheduleRisk(project) {
   const totalDuration = end - start;
   const elapsed = now - start;
 
-  if (elapsed <= 0) return { score: 0, factors: [], recommendations: [] };
-
-  const expectedProgress = (elapsed / totalDuration) * 100;
-  const actualProgress = project.progress_percent || 0;
-  const progressGap = expectedProgress - actualProgress;
-
-  // Behind schedule
-  if (progressGap > 20) {
-    score += 15;
-    factors.push(`Significantly behind schedule (${Math.round(progressGap)}% behind expected)`);
-    recommendations.push('Accelerate work to catch up with timeline');
-    recommendations.push('Review resource allocation');
-  } else if (progressGap > 10) {
-    score += 10;
-    factors.push(`Behind schedule (${Math.round(progressGap)}% behind expected)`);
-    recommendations.push('Monitor progress closely');
-  } else if (progressGap > 5) {
-    score += 5;
-    factors.push(`Slightly behind schedule (${Math.round(progressGap)}% behind)`);
+  if (elapsed <= 0) {
+    return { score: 0, factors: ['Project scheduled to commence in future'], recommendations: ['Finalize pre-construction mobilization'] };
   }
 
-  // Days remaining
-  const daysRemaining = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
-  if (daysRemaining < 0) {
+  const expectedProgress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+  const actualProgress = Number(project.progress_percent || 0);
+  const progressGap = expectedProgress - actualProgress;
+
+  if (now > end) {
+    score += 15;
+    factors.push(`Past scheduled completion deadline (${project.end_date})`);
+    recommendations.push('Establish expedited recovery schedule and management escalation');
+  } else {
+    const daysRemaining = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+    if (daysRemaining < 30) {
+      score += 5;
+      factors.push(`Approaching target deadline (${daysRemaining} days remaining)`);
+      recommendations.push('Prioritize critical-path milestone deliverables');
+    }
+  }
+
+  if (progressGap > 20) {
+    score += 15;
+    factors.push(`Physical progress (${actualProgress}%) is ${Math.round(progressGap)}% behind expected timeline`);
+    recommendations.push('Accelerate contractor deployment to close schedule variance');
+  } else if (progressGap > 10) {
     score += 10;
-    factors.push('Project is overdue');
-    recommendations.push('Escalate to management');
-  } else if (daysRemaining < 30) {
-    score += 5;
-    factors.push('Approaching deadline (less than 30 days remaining)');
-    recommendations.push('Prioritize critical tasks');
+    factors.push(`Physical progress (${actualProgress}%) is slightly behind expected timeline (${Math.round(progressGap)}% gap)`);
+    recommendations.push('Monitor milestone velocity closely');
   }
 
   return { score, factors, recommendations };
@@ -109,33 +122,29 @@ function calculateBudgetRisk(project) {
   const recommendations = [];
   let score = 0;
 
-  if (!project.budget_total || project.budget_total === 0) {
+  const total = Number(project.budget_total || 0);
+  const utilized = Number(project.budget_utilized || 0);
+
+  if (total === 0) {
     return { score: 5, factors: ['No budget allocated'], recommendations: ['Define project budget'] };
   }
 
-  const utilizationRate = (project.budget_utilized || 0) / project.budget_total;
-  const progressRate = (project.progress_percent || 0) / 100;
+  const utilizationRate = utilized / total;
+  const progressRate = Number(project.progress_percent || 0) / 100;
 
-  // Budget consumed vs progress made
   if (utilizationRate > 0.9) {
     score += 15;
-    factors.push('Budget nearly exhausted (>90% used)');
-    recommendations.push('Review spending immediately');
-    recommendations.push('Request additional funding if needed');
+    factors.push(`Budget utilization high (${Math.round(utilizationRate * 100)}% utilized)`);
+    recommendations.push('Review cost projections and financial reserves');
   } else if (utilizationRate > 0.75) {
     score += 10;
-    factors.push('High budget utilization (>75% used)');
-    recommendations.push('Monitor spending closely');
-  } else if (utilizationRate > 0.5) {
-    score += 5;
-    factors.push('Moderate budget utilization');
+    factors.push(`Moderate-to-high budget drawdown (${Math.round(utilizationRate * 100)}% utilized)`);
   }
 
-  // Budget vs Progress comparison
   if (utilizationRate > progressRate + 0.2) {
     score += 10;
-    factors.push('Budget consumed faster than progress made');
-    recommendations.push('Investigate cost overruns');
+    factors.push(`Budget burn rate (${Math.round(utilizationRate * 100)}%) outpaces physical progress (${Math.round(progressRate * 100)}%)`);
+    recommendations.push('Audit contractor invoicing against verified site deliverables');
   }
 
   return { score, factors, recommendations };
@@ -157,32 +166,19 @@ function calculateMilestoneRisk(project) {
   );
 
   const blockedMilestones = milestones.filter(m => m.status === 'blocked');
-  const pendingMilestones = milestones.filter(m => m.status === 'pending');
-  const inProgressMilestones = milestones.filter(m => m.status === 'in_progress');
 
-  // Overdue milestones
   if (overdueMilestones.length > 0) {
     score += 15;
-    factors.push(`${overdueMilestones.length} milestone(s) overdue`);
-    recommendations.push('Address overdue milestones immediately');
+    const names = overdueMilestones.map(m => m.title).slice(0, 2).join(', ');
+    factors.push(`${overdueMilestones.length} milestone(s) overdue: ${names}`);
+    recommendations.push('Address overdue milestone deliverables immediately');
   }
 
-  // Blocked milestones
   if (blockedMilestones.length > 0) {
-    score += 10;
-    factors.push(`${blockedMilestones.length} milestone(s) blocked`);
-    recommendations.push('Resolve blockers to unblock progress');
-  }
-
-  // Many pending milestones close to deadline
-  const urgentPending = pendingMilestones.filter(m => {
-    const daysUntilDue = Math.ceil((new Date(m.due_date) - new Date()) / (1000 * 60 * 60 * 24));
-    return daysUntilDue < 30;
-  });
-
-  if (urgentPending.length > 0) {
-    score += 5;
-    factors.push(`${urgentPending.length} milestone(s) due within 30 days`);
+    score += 15;
+    const names = blockedMilestones.map(m => m.title).slice(0, 2).join(', ');
+    factors.push(`${blockedMilestones.length} milestone(s) blocked: ${names}`);
+    recommendations.push('Resolve site interdependencies and clear milestone blockers');
   }
 
   return { score, factors, recommendations };
@@ -195,36 +191,30 @@ function calculateStatusRisk(project) {
 
   switch (project.status) {
     case 'delayed':
-      score += 20;
-      factors.push('Project status is DELAYED');
-      recommendations.push('Develop recovery plan');
-      recommendations.push('Escalate to stakeholders');
+      score += 25;
+      factors.push('Project status is marked as DELAYED');
+      recommendations.push('Initiate formal schedule recovery plan with executive oversight');
       break;
     case 'on_hold':
-      score += 15;
-      factors.push('Project is ON HOLD');
-      recommendations.push('Review hold reasons and plan restart');
+      score += 20;
+      factors.push('Project status is currently ON HOLD');
+      recommendations.push('Convene stakeholder review to evaluate resumption conditions');
       break;
     case 'cancelled':
       score += 20;
-      factors.push('Project is CANCELLED');
-      recommendations.push('Document lessons learned');
-      break;
-    case 'completed':
-      score = Math.min(score, 5);
-      factors.push('Project completed');
+      factors.push('Project has been CANCELLED');
+      recommendations.push('Complete project post-mortem and audit unspent allocations');
       break;
     case 'planning':
       score += 5;
-      factors.push('Project in planning phase');
+      factors.push('Project in initial planning and design phase');
       break;
     case 'active':
     default:
-      // Active is normal, no additional score
+      factors.push('Project actively progressing');
       break;
   }
 
-  // Priority adjustment
   if (project.priority === 'critical') {
     score = Math.min(100, score * 1.2);
   }

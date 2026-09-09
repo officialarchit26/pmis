@@ -60,7 +60,7 @@ export default function ExecutiveDashboard() {
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <KPICard title="Total Projects" value={kpis?.total_projects || 0} icon="📁" color="blue" />
-        <KPICard title="Active" value={kpis?.active_projects || 0} icon="🔄" color="green" />
+        <KPICard title="Ongoing" value={kpis?.ongoing_projects ?? kpis?.active_projects ?? 0} icon="🔄" color="green" />
         <KPICard title="Completed" value={kpis?.completed_projects || 0} icon="✅" color="indigo" />
         <KPICard title="Delayed" value={kpis?.delayed_projects || 0} icon="⚠️" color="red" />
         <KPICard title="At Risk" value={kpis?.at_risk_projects || 0} icon="🚨" color="orange" />

@@ -84,11 +84,14 @@ router.post('/assistant', async (req, res) => {
 
     // Build context from project data
     let context = '';
+    let selectedProject = null;
+    let allProjects = [];
 
     if (project_id) {
       if (isUsingMemoryStore()) {
         const project = memoryStore.getProjectById(project_id);
         if (project) {
+          selectedProject = project;
           context = buildProjectContext(project, project_id);
         }
       } else {
@@ -103,6 +106,7 @@ router.post('/assistant', async (req, res) => {
           const { data: budgets } = await supabase.from('budgets').select('*').eq('project_id', project_id);
           project.milestones = milestones || [];
           project.budgets = budgets || [];
+          selectedProject = project;
           context = buildProjectContextForDatabase(project);
         }
       }
@@ -110,35 +114,34 @@ router.post('/assistant', async (req, res) => {
 
     // General context if no project specified
     if (!context) {
-      let projects = [];
       if (isUsingMemoryStore()) {
-        projects = memoryStore.projects;
+        allProjects = memoryStore.projects;
       } else {
         const supabase = getSupabase();
         const { data } = await supabase
           .from('projects')
           .select('*, department:departments(name), district:districts(name)');
-        projects = data || [];
+        allProjects = data || [];
       }
 
-      if (projects.length === 0) {
+      if (allProjects.length === 0) {
         context = 'No projects available in the system.';
       } else {
-        const total = projects.length;
-        const active = projects.filter(p => p.status === 'active').length;
-        const delayed = projects.filter(p => p.status === 'delayed');
-        const atRisk = projects.filter(p => (p.risk_score || 0) >= 60);
-        const totalBudget = projects.reduce((sum, p) => sum + (p.budget_total || 0), 0);
-        const utilizedBudget = projects.reduce((sum, p) => sum + (p.budget_utilized || 0), 0);
+        const total = allProjects.length;
+        const active = allProjects.filter(p => p.status === 'active').length;
+        const delayed = allProjects.filter(p => p.status === 'delayed');
+        const atRisk = allProjects.filter(p => Number(p.risk_score || 0) >= 60 || p.status === 'delayed');
+        const totalBudget = allProjects.reduce((sum, p) => sum + Number(p.budget_total || 0), 0);
+        const utilizedBudget = allProjects.reduce((sum, p) => sum + Number(p.budget_utilized || 0), 0);
 
         context = `PMIS System Ground-Truth Data:\n`;
         context += `- Total Projects: ${total}\n`;
         context += `- Active Projects: ${active}\n`;
-        context += `- Delayed Projects (${delayed.length}): ${delayed.map(p => `${p.name} (${p.progress_percent}% progress, budget $${(p.budget_total || 0).toLocaleString()})`).join('; ') || 'None'}\n`;
+        context += `- Delayed Projects (${delayed.length}): ${delayed.map(p => `${p.name} (${p.progress_percent}% progress, budget $${Number(p.budget_total || 0).toLocaleString()})`).join('; ') || 'None'}\n`;
         context += `- High Risk Projects (${atRisk.length}): ${atRisk.map(p => `${p.name} (Risk ${p.risk_score}/100, status: ${p.status})`).join('; ') || 'None'}\n`;
         context += `- Total System Budget: $${totalBudget.toLocaleString()}\n`;
         context += `- Utilized Budget: $${utilizedBudget.toLocaleString()} (${totalBudget > 0 ? Math.round((utilizedBudget / totalBudget) * 100) : 0}%)\n`;
-        context += `- All Projects Summary:\n` + projects.slice(0, 10).map(p => `  * ${p.name}: status=${p.status}, progress=${p.progress_percent}%, risk=${p.risk_score}/100, dept=${p.department?.name || 'General'}`).join('\n');
+        context += `- All Projects Summary:\n` + allProjects.slice(0, 10).map(p => `  * ${p.name}: status=${p.status}, progress=${p.progress_percent}%, risk=${p.risk_score}/100, dept=${p.department?.name || 'General'}`).join('\n');
       }
     }
 
@@ -150,10 +153,10 @@ router.post('/assistant', async (req, res) => {
         response = await askGemini(message, context);
       } catch (geminiErr) {
         console.error('Gemini API error, using fallback:', geminiErr.message);
-        response = generateFallbackResponse(message, context);
+        response = generateFallbackResponse(message, context, allProjects, selectedProject);
       }
     } else {
-      response = generateFallbackResponse(message, context);
+      response = generateFallbackResponse(message, context, allProjects, selectedProject);
     }
 
     res.json({
@@ -176,7 +179,7 @@ function buildProjectContext(project, projectId) {
   let context = `Project: ${project.name}\n`;
   context += `Status: ${project.status}\n`;
   context += `Progress: ${project.progress_percent}%\n`;
-  context += `Budget: $${project.budget_total.toLocaleString()} / $${project.budget_utilized.toLocaleString()}\n`;
+  context += `Budget: $${Number(project.budget_total || 0).toLocaleString()} / $${Number(project.budget_utilized || 0).toLocaleString()}\n`;
   context += `Risk Score: ${project.risk_score}/100\n`;
 
   const milestones = memoryStore.getMilestonesByProject(projectId);
@@ -194,7 +197,7 @@ function buildProjectContextForDatabase(project) {
   let context = `Project: ${project.name}\n`;
   context += `Status: ${project.status}\n`;
   context += `Progress: ${project.progress_percent || 0}%\n`;
-  context += `Budget: $${(project.budget_total || 0).toLocaleString()} / $${(project.budget_utilized || 0).toLocaleString()}\n`;
+  context += `Budget: $${Number(project.budget_total || 0).toLocaleString()} / $${Number(project.budget_utilized || 0).toLocaleString()}\n`;
   context += `Risk Score: ${project.risk_score || 0}/100\n`;
 
   if (project.milestones && project.milestones.length > 0) {
@@ -206,28 +209,90 @@ function buildProjectContextForDatabase(project) {
   return context;
 }
 
-// Fallback response generator
-function generateFallbackResponse(message, context) {
+// Fallback response generator grounded in real project data
+function generateFallbackResponse(message, context, allProjects = [], selectedProject = null) {
   const lowerMessage = message.toLowerCase();
-  const projects = isUsingMemoryStore() ? memoryStore.projects : [];
+  const projects = allProjects && allProjects.length > 0
+    ? allProjects
+    : (isUsingMemoryStore() ? memoryStore.projects : []);
 
-  // Check for specific question patterns
+  // If asking about a specific project
+  if (selectedProject) {
+    const p = selectedProject;
+    const total = Number(p.budget_total || 0);
+    const utilized = Number(p.budget_utilized || 0);
+    const percent = total > 0 ? Math.round((utilized / total) * 100) : 0;
+
+    if (lowerMessage.includes('budget') || lowerMessage.includes('cost')) {
+      return `Budget Analysis for "${p.name}":\n` +
+        `- Total Allocated: $${total.toLocaleString()}\n` +
+        `- Amount Utilized: $${utilized.toLocaleString()} (${percent}%)\n` +
+        `- Remaining: $${(total - utilized).toLocaleString()}\n` +
+        `- Financial Status: ${percent > 90 ? 'High budget drawdown' : 'Within budget parameters'}`;
+    }
+
+    if (lowerMessage.includes('risk') || lowerMessage.includes('factor')) {
+      const riskLevel = p.risk_score <= 25 ? 'LOW' : p.risk_score <= 50 ? 'MEDIUM' : p.risk_score <= 75 ? 'HIGH' : 'CRITICAL';
+      return `Risk Assessment for "${p.name}":\n` +
+        `- Current Risk Score: ${p.risk_score || 0}/100\n` +
+        `- Evaluated Level: ${riskLevel} RISK\n` +
+        `- Current Status: ${p.status}\n` +
+        `- Physical Progress: ${p.progress_percent || 0}%`;
+    }
+
+    if (lowerMessage.includes('timeline') || lowerMessage.includes('schedule') || lowerMessage.includes('deadline') || lowerMessage.includes('milestone')) {
+      const milestones = p.milestones || [];
+      return `Timeline & Milestones for "${p.name}":\n` +
+        `- Timeline: ${p.start_date || 'N/A'} to ${p.end_date || 'N/A'}\n` +
+        `- Status: ${p.status}\n` +
+        `- Physical Progress: ${p.progress_percent || 0}%\n` +
+        (milestones.length > 0
+          ? `- Milestones (${milestones.length}):\n` + milestones.map(m => `  * ${m.title}: ${m.status} (due: ${m.due_date})`).join('\n')
+          : '- No milestones recorded');
+    }
+
+    return `Project Summary for "${p.name}":\n` +
+      `- Status: ${p.status}\n` +
+      `- Physical Progress: ${p.progress_percent || 0}%\n` +
+      `- Budget: $${total.toLocaleString()} ($${utilized.toLocaleString()} utilized - ${percent}%)\n` +
+      `- Risk Score: ${p.risk_score || 0}/100\n` +
+      `- Department: ${p.department?.name || 'N/A'}\n` +
+      `- District: ${p.district?.name || 'N/A'}`;
+  }
+
+  // System-wide queries
   if (lowerMessage.includes('delayed') || lowerMessage.includes('delay')) {
     const delayed = projects.filter(p => p.status === 'delayed');
     if (delayed.length === 0) {
       return 'There are no delayed projects at the moment. All projects are on schedule!';
     }
-    return `There are ${delayed.length} delayed project(s):\n` +
-      delayed.map(p => `- ${p.name} (${p.progress_percent || 0}% complete)`).join('\n');
+    return `There is ${delayed.length} delayed project(s):\n` +
+      delayed.map(p => `- ${p.name}: ${p.progress_percent || 0}% complete, budget $${Number(p.budget_total || 0).toLocaleString()} (Risk: ${p.risk_score || 0}/100)`).join('\n');
   }
 
-  if (lowerMessage.includes('at risk') || lowerMessage.includes('risk')) {
-    const atRisk = projects.filter(p => (p.risk_score || 0) >= 60);
+  if (lowerMessage.includes('at risk') || lowerMessage.includes('risk') || lowerMessage.includes('highest risk')) {
+    const atRisk = projects.filter(p => Number(p.risk_score || 0) >= 60 || p.status === 'delayed');
     if (atRisk.length === 0) {
       return 'No projects are currently at high risk. All projects have acceptable risk levels.';
     }
-    return `There are ${atRisk.length} project(s) at risk (score ≥60):\n` +
-      atRisk.map(p => `- ${p.name}: Risk Score ${p.risk_score || 0}/100`).join('\n');
+    return `There are ${atRisk.length} project(s) at risk (score ≥60 or delayed):\n` +
+      atRisk.map(p => `- ${p.name}: Risk Score ${p.risk_score || 0}/100 (Status: ${p.status}, Progress: ${p.progress_percent || 0}%)`).join('\n');
+  }
+
+  if (lowerMessage.includes('ongoing') || lowerMessage.includes('active')) {
+    const active = projects.filter(p => p.status === 'active');
+    return `There are ${active.length} ongoing (active) projects in the PMIS database, with an average progress of ${
+      active.length > 0 ? Math.round((active.reduce((s, p) => s + Number(p.progress_percent || 0), 0) / active.length) * 10) / 10 : 0
+    }%.`;
+  }
+
+  if (lowerMessage.includes('completed')) {
+    const completed = projects.filter(p => p.status === 'completed');
+    if (completed.length === 0) {
+      return 'No projects have been completed yet.';
+    }
+    return `There is ${completed.length} completed project(s):\n` +
+      completed.map(p => `- ${p.name}: 100% progress, final budget $${Number(p.budget_utilized || 0).toLocaleString()} of $${Number(p.budget_total || 0).toLocaleString()}`).join('\n');
   }
 
   if (lowerMessage.includes('deadline') || lowerMessage.includes('upcoming')) {
@@ -247,11 +312,11 @@ function generateFallbackResponse(message, context) {
   }
 
   if (lowerMessage.includes('budget')) {
-    const total = projects.reduce((sum, p) => sum + (p.budget_total || 0), 0);
-    const utilized = projects.reduce((sum, p) => sum + (p.budget_utilized || 0), 0);
+    const total = projects.reduce((sum, p) => sum + Number(p.budget_total || 0), 0);
+    const utilized = projects.reduce((sum, p) => sum + Number(p.budget_utilized || 0), 0);
     const percent = total > 0 ? Math.round((utilized / total) * 100) : 0;
 
-    return `Budget Overview:\n` +
+    return `System-wide Budget Overview:\n` +
       `- Total Budget: $${total.toLocaleString()}\n` +
       `- Utilized: $${utilized.toLocaleString()}\n` +
       `- Utilization Rate: ${percent}%\n` +
@@ -259,14 +324,18 @@ function generateFallbackResponse(message, context) {
   }
 
   if (lowerMessage.includes('progress') && lowerMessage.includes('department')) {
-    const departments = isUsingMemoryStore() ? memoryStore.departments : [];
-    const deptStats = departments.map(dept => {
-      const deptProjects = projects.filter(p => p.department_id === dept.id);
-      const avgProgress = deptProjects.length > 0
-        ? Math.round(deptProjects.reduce((s, p) => s + (p.progress_percent || 0), 0) / deptProjects.length)
-        : 0;
-      return { name: dept.name || dept.name, progress: avgProgress, count: deptProjects.length };
-    }).sort((a, b) => b.progress - a.progress);
+    const deptMap = {};
+    projects.forEach(p => {
+      const dName = p.department?.name || 'General';
+      if (!deptMap[dName]) deptMap[dName] = { name: dName, totalProg: 0, count: 0 };
+      deptMap[dName].totalProg += Number(p.progress_percent || 0);
+      deptMap[dName].count += 1;
+    });
+    const deptStats = Object.values(deptMap).map(d => ({
+      name: d.name,
+      progress: d.count > 0 ? Math.round((d.totalProg / d.count) * 10) / 10 : 0,
+      count: d.count
+    })).sort((a, b) => b.progress - a.progress);
 
     return 'Department Progress Rankings:\n' +
       deptStats.map((d, i) => `${i + 1}. ${d.name}: ${d.progress}% (${d.count} projects)`).join('\n');
@@ -275,12 +344,13 @@ function generateFallbackResponse(message, context) {
   // Default response
   return `I understand you're asking about: "${message}"\n\n` +
     `I can help with questions about:\n` +
-    `- Project delays and status\n` +
-    `- Risk analysis\n` +
-    `- Budget information\n` +
+    `- Project delays and status (e.g. "Which projects are delayed?")\n` +
+    `- Risk analysis (e.g. "Which projects have highest risk?")\n` +
+    `- Budget information (e.g. "Give me a budget summary")\n` +
+    `- Ongoing or completed projects\n` +
     `- Upcoming deadlines\n` +
-    `- Department progress\n\n` +
-    `Please ask a more specific question, or provide a project ID for detailed analysis.`;
+    `- Department performance\n\n` +
+    `Please ask a specific question or specify a project for targeted intelligence.`;
 }
 
 // Generate report content

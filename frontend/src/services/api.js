@@ -1,7 +1,10 @@
 // PMIS Frontend API Service Layer
 // Handles all communication with the backend API
 
-const API_BASE = '/api';
+const rawApiUrl = import.meta.env.VITE_API_URL;
+export const API_BASE = rawApiUrl
+  ? (rawApiUrl.replace(/\/+$/, '').endsWith('/api') ? rawApiUrl.replace(/\/+$/, '') : `${rawApiUrl.replace(/\/+$/, '')}/api`)
+  : '/api';
 
 class ApiError extends Error {
   constructor(message, status, code) {

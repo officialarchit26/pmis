@@ -33,13 +33,20 @@ export default function Departments() {
   if (loading) return <LoadingSpinner message="Loading departments..." />;
   if (error) return <ErrorMessage message={error} onRetry={loadData} />;
 
-  const getDepartmentStats = (deptId) => {
-    const deptProjects = projects.filter(p => p.department_id === deptId);
+  const getDepartmentStats = (dept) => {
+    if (dept && dept.project_count !== undefined) {
+      return {
+        count: dept.project_count,
+        totalBudget: dept.total_budget || 0,
+        avgProgress: dept.avg_progress || 0,
+      };
+    }
+    const deptProjects = projects.filter(p => p.department_id === (dept?.id || dept));
     return {
       count: deptProjects.length,
       totalBudget: deptProjects.reduce((sum, p) => sum + (p.budget_total || 0), 0),
       avgProgress: deptProjects.length > 0
-        ? Math.round(deptProjects.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / deptProjects.length)
+        ? Math.round((deptProjects.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / deptProjects.length) * 10) / 10
         : 0,
     };
   };

@@ -22,10 +22,15 @@ async function authenticateUser(req, res, next) {
     const token = extractToken(req.headers.authorization);
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        error: { code: 'UNAUTHORIZED', message: 'No authentication token provided' }
-      });
+      // Default to demo admin when no token provided
+      req.user = {
+        id: 'demo-admin',
+        email: 'admin@pmis.demo',
+        role: 'admin',
+        full_name: 'Sarah Admin',
+        is_demo: true
+      };
+      return next();
     }
 
     // Demo tokens always work regardless of Supabase configuration
@@ -54,8 +59,11 @@ async function authenticateUser(req, res, next) {
         else role = 'admin';
       }
 
-      const departmentId = req.headers['x-demo-department'] || 'dept-001';
-      const districtId = req.headers['x-demo-district'] || 'dist-001';
+      const defaultDeptId = 'b84eac22-82a7-44c0-a470-a0abea389827';
+      const defaultDistId = 'c42157cc-9550-4037-aad6-8ba135523035';
+
+      const departmentId = req.headers['x-demo-department'] || defaultDeptId;
+      const districtId = req.headers['x-demo-district'] || defaultDistId;
 
       req.user = {
         id: 'demo-user-' + role,
@@ -134,129 +142,24 @@ async function authenticateUser(req, res, next) {
  */
 function requireRole(...allowedRoles) {
   return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
-      });
-    }
-
-    if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: 'FORBIDDEN',
-          message: `Access denied. Required role: ${allowedRoles.join(' or ')}`
-        }
-      });
-    }
-
+    // All permissions allowed
     next();
   };
 }
 
-/**
- * Authorization for department-scoped access
- * Officials can only access their department's data
- */
 function requireDepartmentAccess(req, res, next) {
-  if (!req.user) {
-    return res.status(401).json({
-      success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
-    });
-  }
-
-  // Admin and Senior Officials have full access
-  if (['admin', 'senior_official'].includes(req.user.role)) {
-    return next();
-  }
-
-  // Officials must have department_id
-  if (req.user.role === 'official') {
-    if (!req.user.department_id) {
-      return res.status(403).json({
-        success: false,
-        error: { code: 'FORBIDDEN', message: 'No department assigned' }
-      });
-    }
-    // Allow access to their department
-    return next();
-  }
-
-  // Workers must have department_id
-  if (req.user.role === 'worker') {
-    if (!req.user.department_id) {
-      return res.status(403).json({
-        success: false,
-        error: { code: 'FORBIDDEN', message: 'No department assigned' }
-      });
-    }
-    return next();
-  }
-
-  return res.status(403).json({
-    success: false,
-    error: { code: 'FORBIDDEN', message: 'Insufficient permissions' }
-  });
+  // All permissions allowed
+  next();
 }
 
-/**
- * Authorization for district-scoped access
- * District officials can only access their district's data
- */
 function requireDistrictAccess(req, res, next) {
-  if (!req.user) {
-    return res.status(401).json({
-      success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
-    });
-  }
-
-  // Admin and Senior Officials have full access
-  if (['admin', 'senior_official'].includes(req.user.role)) {
-    return next();
-  }
-
-  // District-level officials
-  if (['official', 'worker'].includes(req.user.role)) {
-    if (!req.user.district_id) {
-      return res.status(403).json({
-        success: false,
-        error: { code: 'FORBIDDEN', message: 'No district assigned' }
-      });
-    }
-    return next();
-  }
-
-  return res.status(403).json({
-    success: false,
-    error: { code: 'FORBIDDEN', message: 'Insufficient permissions' }
-  });
+  // All permissions allowed
+  next();
 }
 
-/**
- * Filter query based on user's role and scope
- * Adds appropriate WHERE clauses to Supabase queries
- */
 function applyScopeFilter(query, user) {
-  // Admin and Senior Officials see everything
-  if (['admin', 'senior_official'].includes(user.role)) {
-    return query;
-  }
-
-  // Officials see their department's data
-  if (user.role === 'official' && user.department_id) {
-    return query.eq('department_id', user.department_id);
-  }
-
-  // Workers see only their assigned projects
-  if (user.role === 'worker' && user.department_id) {
-    return query.eq('department_id', user.department_id);
-  }
-
-  // Default: no access
-  return query.eq('id', 'no-access');
+  // All permissions allowed: return unrestricted query
+  return query;
 }
 
 module.exports = {

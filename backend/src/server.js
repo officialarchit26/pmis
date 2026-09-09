@@ -10,7 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+const corsOrigin = process.env.CORS_ORIGIN;
+app.use(cors({
+  origin: corsOrigin ? corsOrigin.split(',').map(s => s.trim()) : true,
+  credentials: true
+}));
 app.use(express.json());
 
 // Import routes

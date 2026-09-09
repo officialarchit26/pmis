@@ -41,6 +41,38 @@
   },
   {
     "id": "bud-006",
+    "project_id": "proj-002",
+    "category": "Fixtures & Furniture",
+    "allocated": 500000,
+    "utilized": 375000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-007",
+    "project_id": "proj-003",
+    "category": "Engineering & Permitting",
+    "allocated": 3000000,
+    "utilized": 400000,
+    "fiscal_year": "2026"
+  },
+  {
+    "id": "bud-008",
+    "project_id": "proj-003",
+    "category": "Civil Works",
+    "allocated": 3000000,
+    "utilized": 0,
+    "fiscal_year": "2026"
+  },
+  {
+    "id": "bud-009",
+    "project_id": "proj-003",
+    "category": "Treatment Systems",
+    "allocated": 2000000,
+    "utilized": 0,
+    "fiscal_year": "2026"
+  },
+  {
+    "id": "bud-010",
     "project_id": "proj-004",
     "category": "Materials",
     "allocated": 5000000,
@@ -48,7 +80,7 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-007",
+    "id": "bud-011",
     "project_id": "proj-004",
     "category": "Labor",
     "allocated": 6000000,
@@ -56,7 +88,15 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-008",
+    "id": "bud-012",
+    "project_id": "proj-004",
+    "category": "Tunneling Machinery",
+    "allocated": 4000000,
+    "utilized": 1400000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-013",
     "project_id": "proj-005",
     "category": "Construction",
     "allocated": 3500000,
@@ -64,7 +104,7 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-009",
+    "id": "bud-014",
     "project_id": "proj-005",
     "category": "Medical Equipment",
     "allocated": 1500000,
@@ -72,7 +112,15 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-010",
+    "id": "bud-015",
+    "project_id": "proj-005",
+    "category": "Facility Setup & Staffing",
+    "allocated": 1000000,
+    "utilized": 600000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-016",
     "project_id": "proj-006",
     "category": "Solar Panels",
     "allocated": 8000000,
@@ -80,27 +128,211 @@
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-011",
+    "id": "bud-017",
+    "project_id": "proj-006",
+    "category": "Inverters & Substation",
+    "allocated": 4000000,
+    "utilized": 1200000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-018",
     "project_id": "proj-007",
-    "category": "Repairs",
+    "category": "Structural Repairs",
     "allocated": 3000000,
     "utilized": 1440000,
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-012",
+    "id": "bud-019",
+    "project_id": "proj-007",
+    "category": "Safety Monitoring Systems",
+    "allocated": 1500000,
+    "utilized": 720000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-020",
+    "project_id": "proj-008",
+    "category": "IoT Sensors & Hardware",
+    "allocated": 2000000,
+    "utilized": 1500000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-021",
+    "project_id": "proj-008",
+    "category": "Software & Integration",
+    "allocated": 1500000,
+    "utilized": 1020000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-022",
+    "project_id": "proj-009",
+    "category": "Building Construction",
+    "allocated": 14000000,
+    "utilized": 13900000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-023",
+    "project_id": "proj-009",
+    "category": "Utility Connections",
+    "allocated": 4000000,
+    "utilized": 3950000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-024",
+    "project_id": "proj-009",
+    "category": "Site Landscaping & Paving",
+    "allocated": 2000000,
+    "utilized": 1950000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-025",
+    "project_id": "proj-010",
+    "category": "Cloud Infrastructure",
+    "allocated": 1000000,
+    "utilized": 920000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-026",
+    "project_id": "proj-010",
+    "category": "Software Development",
+    "allocated": 800000,
+    "utilized": 700000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-027",
+    "project_id": "proj-011",
+    "category": "Asphalt & Aggregate",
+    "allocated": 4500000,
+    "utilized": 1600000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-028",
+    "project_id": "proj-011",
+    "category": "Heavy Machinery & Labor",
+    "allocated": 3000000,
+    "utilized": 1025000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-029",
+    "project_id": "proj-012",
+    "category": "Diagnostic Imaging",
+    "allocated": 2500000,
+    "utilized": 1600000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-030",
+    "project_id": "proj-012",
+    "category": "Surgical Technology",
+    "allocated": 1500000,
+    "utilized": 880000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-031",
     "project_id": "proj-013",
-    "category": "Construction",
+    "category": "Construction & Levees",
     "allocated": 6000000,
     "utilized": 1680000,
     "fiscal_year": "2025"
   },
   {
-    "id": "bud-013",
+    "id": "bud-032",
     "project_id": "proj-013",
-    "category": "Engineering",
+    "category": "Engineering & Environmental",
     "allocated": 3000000,
     "utilized": 840000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-033",
+    "project_id": "proj-014",
+    "category": "Turbine Procurement",
+    "allocated": 10000000,
+    "utilized": 250000,
+    "fiscal_year": "2026"
+  },
+  {
+    "id": "bud-034",
+    "project_id": "proj-014",
+    "category": "Foundation & Grid Connection",
+    "allocated": 5000000,
+    "utilized": 500000,
+    "fiscal_year": "2026"
+  },
+  {
+    "id": "bud-035",
+    "project_id": "proj-015",
+    "category": "Point-of-Sale Hardware",
+    "allocated": 300000,
+    "utilized": 240000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-036",
+    "project_id": "proj-015",
+    "category": "Central Software Platform",
+    "allocated": 200000,
+    "utilized": 150000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-037",
+    "project_id": "proj-016",
+    "category": "Filtration Systems",
+    "allocated": 4000000,
+    "utilized": 2100000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-038",
+    "project_id": "proj-016",
+    "category": "Pipeline Network",
+    "allocated": 2500000,
+    "utilized": 1280000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-039",
+    "project_id": "proj-017",
+    "category": "Land & Building Acquisition",
+    "allocated": 3500000,
+    "utilized": 800000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-040",
+    "project_id": "proj-017",
+    "category": "Communication Network",
+    "allocated": 2000000,
+    "utilized": 410000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-041",
+    "project_id": "proj-018",
+    "category": "Vehicle Procurement",
+    "allocated": 6000000,
+    "utilized": 2800000,
+    "fiscal_year": "2025"
+  },
+  {
+    "id": "bud-042",
+    "project_id": "proj-018",
+    "category": "Charging Depot Facilities",
+    "allocated": 2500000,
+    "utilized": 1025000,
     "fiscal_year": "2025"
   }
 ]

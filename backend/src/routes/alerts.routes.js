@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
       });
     } else {
       const supabase = getSupabase();
-      let query = supabase.from('alerts').select('*');
+      let query = supabase.from('alerts').select('*, project:projects(id, name)');
 
       if (project_id) query = query.eq('project_id', project_id);
       if (type) query = query.eq('type', type);
@@ -48,7 +48,10 @@ router.get('/', async (req, res) => {
 
       const { data, error } = await query;
       if (error) throw error;
-      alerts = data || [];
+      alerts = (data || []).map(a => ({
+        ...a,
+        project_name: a.project?.name || 'Unknown'
+      }));
     }
 
     res.json({

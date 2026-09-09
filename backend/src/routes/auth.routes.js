@@ -19,9 +19,12 @@ router.post('/login', async (req, res) => {
     }
 
     // Demo login - accepts any password for demo accounts in demo mode
+    const defaultDeptId = 'b84eac22-82a7-44c0-a470-a0abea389827';
+    const defaultDistId = 'c42157cc-9550-4037-aad6-8ba135523035';
+
     const demoUsers = {
-      'worker@pmis.demo': { role: 'worker', department_id: 'dept-001', district_id: 'dist-001', full_name: 'John Worker' },
-      'official@pmis.demo': { role: 'official', department_id: 'dept-001', district_id: 'dist-001', full_name: 'Jane Official' },
+      'worker@pmis.demo': { role: 'worker', department_id: defaultDeptId, district_id: defaultDistId, full_name: 'John Worker' },
+      'official@pmis.demo': { role: 'official', department_id: defaultDeptId, district_id: defaultDistId, full_name: 'Jane Official' },
       'senior@pmis.demo': { role: 'senior_official', department_id: null, district_id: null, full_name: 'Robert Senior' },
       'admin@pmis.demo': { role: 'admin', department_id: null, district_id: null, full_name: 'Sarah Admin' },
     };

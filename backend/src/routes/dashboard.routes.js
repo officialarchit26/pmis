@@ -9,17 +9,18 @@ function computeKpis(projects) {
   const activeProjects = projects.filter(p => p.status === 'active').length;
   const completedProjects = projects.filter(p => p.status === 'completed').length;
   const delayedProjects = projects.filter(p => p.status === 'delayed').length;
-  const atRiskProjects = projects.filter(p => p.risk_score >= 60).length;
-  const totalBudget = projects.reduce((sum, p) => sum + (p.budget_total || 0), 0);
-  const utilizedBudget = projects.reduce((sum, p) => sum + (p.budget_utilized || 0), 0);
+  const atRiskProjects = projects.filter(p => Number(p.risk_score || 0) >= 60 || p.status === 'delayed').length;
+  const totalBudget = projects.reduce((sum, p) => sum + Number(p.budget_total || 0), 0);
+  const utilizedBudget = projects.reduce((sum, p) => sum + Number(p.budget_utilized || 0), 0);
   const avgProgress =
     projects.length > 0
-      ? projects.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / projects.length
+      ? projects.reduce((sum, p) => sum + Number(p.progress_percent || 0), 0) / projects.length
       : 0;
 
   return {
     total_projects: totalProjects,
     active_projects: activeProjects,
+    ongoing_projects: activeProjects, // Alias for 'Ongoing' dashboard cards
     completed_projects: completedProjects,
     delayed_projects: delayedProjects,
     at_risk_projects: atRiskProjects,
@@ -28,6 +29,49 @@ function computeKpis(projects) {
     utilization_percent: totalBudget > 0 ? Math.round((utilizedBudget / totalBudget) * 100) : 0,
     average_progress: Math.round(avgProgress * 10) / 10
   };
+}
+
+function buildDepartmentStats(departments, projects) {
+  return (departments || []).map(dept => {
+    const deptProjects = (projects || []).filter(p => p.department_id === dept.id);
+    const totalBudget = deptProjects.reduce((s, p) => s + Number(p.budget_total || 0), 0);
+    const utilizedBudget = deptProjects.reduce((s, p) => s + Number(p.budget_utilized || 0), 0);
+    const avgProgress =
+      deptProjects.length > 0
+        ? Math.round((deptProjects.reduce((s, p) => s + Number(p.progress_percent || 0), 0) / deptProjects.length) * 10) / 10
+        : 0;
+    return {
+      department_id: dept.id,
+      department_name: dept.name,
+      department_code: dept.code,
+      project_count: deptProjects.length,
+      total_budget: totalBudget,
+      utilized_budget: utilizedBudget,
+      avg_progress: avgProgress
+    };
+  });
+}
+
+function buildDistrictStats(districts, projects) {
+  return (districts || []).map(dist => {
+    const distProjects = (projects || []).filter(p => p.district_id === dist.id);
+    const totalBudget = distProjects.reduce((s, p) => s + Number(p.budget_total || 0), 0);
+    const utilizedBudget = distProjects.reduce((s, p) => s + Number(p.budget_utilized || 0), 0);
+    const avgProgress =
+      distProjects.length > 0
+        ? Math.round((distProjects.reduce((s, p) => s + Number(p.progress_percent || 0), 0) / distProjects.length) * 10) / 10
+        : 0;
+    return {
+      district_id: dist.id,
+      district_name: dist.name,
+      state: dist.state,
+      region: dist.region,
+      project_count: distProjects.length,
+      total_budget: totalBudget,
+      utilized_budget: utilizedBudget,
+      avg_progress: avgProgress
+    };
+  });
 }
 
 // GET /api/dashboard/summary
@@ -44,42 +88,8 @@ router.get('/summary', async (req, res) => {
         success: true,
         data: {
           kpis: computeKpis(projects),
-          projects_by_department: departments.map(dept => {
-            const deptProjects = projects.filter(p => p.department_id === dept.id);
-            return {
-              department_id: dept.id,
-              department_name: dept.name,
-              project_count: deptProjects.length,
-              total_budget: deptProjects.reduce((s, p) => s + (p.budget_total || 0), 0),
-              utilized_budget: deptProjects.reduce((s, p) => s + (p.budget_utilized || 0), 0),
-              avg_progress:
-                deptProjects.length > 0
-                  ? Math.round(
-                      (deptProjects.reduce((s, p) => s + (p.progress_percent || 0), 0) /
-                        deptProjects.length) *
-                        10
-                    ) / 10
-                  : 0
-            };
-          }),
-          projects_by_district: districts.map(dist => {
-            const distProjects = projects.filter(p => p.district_id === dist.id);
-            return {
-              district_id: dist.id,
-              district_name: dist.name,
-              state: dist.state,
-              project_count: distProjects.length,
-              total_budget: distProjects.reduce((s, p) => s + (p.budget_total || 0), 0),
-              avg_progress:
-                distProjects.length > 0
-                  ? Math.round(
-                      (distProjects.reduce((s, p) => s + (p.progress_percent || 0), 0) /
-                        distProjects.length) *
-                        10
-                    ) / 10
-                  : 0
-            };
-          }),
+          projects_by_department: buildDepartmentStats(departments, projects),
+          projects_by_district: buildDistrictStats(districts, projects),
           projects_by_status: ['planning', 'active', 'on_hold', 'completed', 'delayed', 'cancelled'].map(
             status => ({
               status,
@@ -90,8 +100,8 @@ router.get('/summary', async (req, res) => {
             .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
             .slice(0, 5),
           critical_projects: projects
-            .filter(p => p.risk_score >= 60 || p.status === 'delayed')
-            .sort((a, b) => b.risk_score - a.risk_score)
+            .filter(p => Number(p.risk_score || 0) >= 60 || p.status === 'delayed')
+            .sort((a, b) => Number(b.risk_score || 0) - Number(a.risk_score || 0))
             .slice(0, 5),
           upcoming_deadlines: [...projects]
             .filter(p => p.status !== 'completed' && p.end_date)
@@ -118,32 +128,8 @@ router.get('/summary', async (req, res) => {
         success: true,
         data: {
           kpis: computeKpis(projects || []),
-          projects_by_department: (departments || []).map(dept => {
-            const deptProjects = (projects || []).filter(p => p.department_id === dept.id);
-            return {
-              department_id: dept.id,
-              department_name: dept.name,
-              project_count: deptProjects.length,
-              total_budget: deptProjects.reduce((s, p) => s + (p.budget_total || 0), 0),
-              utilized_budget: deptProjects.reduce((s, p) => s + (p.budget_utilized || 0), 0),
-              avg_progress: deptProjects.length > 0
-                ? Math.round((deptProjects.reduce((s, p) => s + (p.progress_percent || 0), 0) / deptProjects.length) * 10) / 10
-                : 0
-            };
-          }),
-          projects_by_district: (districts || []).map(dist => {
-            const distProjects = (projects || []).filter(p => p.district_id === dist.id);
-            return {
-              district_id: dist.id,
-              district_name: dist.name,
-              state: dist.state,
-              project_count: distProjects.length,
-              total_budget: distProjects.reduce((s, p) => s + (p.budget_total || 0), 0),
-              avg_progress: distProjects.length > 0
-                ? Math.round((distProjects.reduce((s, p) => s + (p.progress_percent || 0), 0) / distProjects.length) * 10) / 10
-                : 0
-            };
-          }),
+          projects_by_department: buildDepartmentStats(departments || [], projects || []),
+          projects_by_district: buildDistrictStats(districts || [], projects || []),
           projects_by_status: ['planning', 'active', 'on_hold', 'completed', 'delayed', 'cancelled'].map(
             status => ({
               status,
@@ -154,8 +140,8 @@ router.get('/summary', async (req, res) => {
             .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
             .slice(0, 5),
           critical_projects: (projects || [])
-            .filter(p => p.risk_score >= 60 || p.status === 'delayed')
-            .sort((a, b) => b.risk_score - a.risk_score)
+            .filter(p => Number(p.risk_score || 0) >= 60 || p.status === 'delayed')
+            .sort((a, b) => Number(b.risk_score || 0) - Number(a.risk_score || 0))
             .slice(0, 5),
           upcoming_deadlines: (projects || [])
             .filter(p => p.status !== 'completed' && p.end_date)

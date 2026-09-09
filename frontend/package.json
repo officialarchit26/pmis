@@ -1,7 +1,6 @@
 {
   "name": "pmis-frontend",
   "version": "1.0.0",
-  "description": "PMIS Frontend - Project Monitoring & Intelligence System",
   "type": "module",
   "scripts": {
     "dev": "vite",

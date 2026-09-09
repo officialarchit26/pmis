@@ -3,23 +3,49 @@ const express = require('express');
 const router = express.Router();
 const { getSupabase, isUsingMemoryStore, memoryStore } = require('../config/database');
 
+function attachDepartmentStats(dept, projects) {
+  const deptProjects = projects.filter(p => p.department_id === dept.id);
+  const totalBudget = deptProjects.reduce((sum, p) => sum + Number(p.budget_total || 0), 0);
+  const utilizedBudget = deptProjects.reduce((sum, p) => sum + Number(p.budget_utilized || 0), 0);
+  const avgProgress =
+    deptProjects.length > 0
+      ? Math.round((deptProjects.reduce((sum, p) => sum + Number(p.progress_percent || 0), 0) / deptProjects.length) * 10) / 10
+      : 0;
+
+  return {
+    ...dept,
+    project_count: deptProjects.length,
+    total_budget: totalBudget,
+    utilized_budget: utilizedBudget,
+    avg_progress: avgProgress
+  };
+}
+
 // GET /api/departments
 router.get('/', async (req, res) => {
   try {
     let departments;
+    let projects;
 
     if (isUsingMemoryStore()) {
       departments = memoryStore.departments;
+      projects = memoryStore.projects;
     } else {
       const supabase = getSupabase();
-      const { data, error } = await supabase.from('departments').select('*');
-      if (error) throw error;
-      departments = data || [];
+      const [deptRes, projRes] = await Promise.all([
+        supabase.from('departments').select('*'),
+        supabase.from('projects').select('*')
+      ]);
+      if (deptRes.error) throw deptRes.error;
+      departments = deptRes.data || [];
+      projects = projRes.data || [];
     }
+
+    const data = departments.map(d => attachDepartmentStats(d, projects));
 
     res.json({
       success: true,
-      data: departments
+      data
     });
   } catch (error) {
     res.status(500).json({
@@ -34,29 +60,30 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     let department;
+    let projects;
 
     if (isUsingMemoryStore()) {
       department = memoryStore.getDepartmentById(id);
-      if (!department) {
-        return res.status(404).json({
-          success: false,
-          error: { code: 'NOT_FOUND', message: 'Department not found' }
-        });
-      }
-
-      // Add project count
-      const projects = memoryStore.projects.filter(p => p.department_id === id);
-      department = {
-        ...department,
-        project_count: projects.length,
-        total_budget: projects.reduce((sum, p) => sum + p.budget_total, 0)
-      };
+      projects = memoryStore.projects;
     } else {
       const supabase = getSupabase();
-      const { data, error } = await supabase.from('departments').select('*').eq('id', id).single();
-      if (error) throw error;
-      department = data;
+      const [deptRes, projRes] = await Promise.all([
+        supabase.from('departments').select('*').eq('id', id).single(),
+        supabase.from('projects').select('*').eq('department_id', id)
+      ]);
+      if (deptRes.error) throw deptRes.error;
+      department = deptRes.data;
+      projects = projRes.data || [];
     }
+
+    if (!department) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Department not found' }
+      });
+    }
+
+    department = attachDepartmentStats(department, projects);
 
     res.json({
       success: true,
